@@ -5,19 +5,30 @@
 // directly. Rather than rewrite them, this dispatches to one of them and
 // removes the subcommand token from argv first, so each module sees exactly
 // the argv shape it saw when it was run as `node dist/record.js ...`.
-import { ConfigError, takeConfigArg, writeDefaultConfig } from './config.js';
+import { ConfigError, overrideArgs, patchPaths, takeConfigArg, writeConfig } from './config.js';
 const HELP = `pretti - record your terminal, get a GIF
 
 Usage
   pretti [record] [out.gif] [capture.jsonl]   record a session and render it (default)
   pretti capture [capture.jsonl]              record only, no GIF
   pretti render [capture.jsonl] [out.gif]     render a GIF from an earlier capture
-  pretti config [pretti.config.json]          write a config file you can edit
+  pretti config [pretti.config.json] [...]    write or edit a config file
 
 Options
   --config <file>  theme to render with (default: the nearest one found)
   -h, --help       show this message
   -v, --version    show the version
+
+Settings
+  Any setting can be given as a flag, named for its path in the config file:
+
+    pretti --terminal.background '#101014' --font.size 24
+    pretti render --animation.fps 15 old.jsonl slow.gif
+
+  Short names for the common ones: --bg, --fg, --cursor, --palette,
+  --font-size, --font-family, --window-bg, --margin, --padding, --radius,
+  --title-bar, --fps, --hold, --quality. On/off settings take a bare flag
+  either way: --no-title-bar, --styles.dim, --no-font.ligatures.
 
 Notes
   Recording starts a shell. Use it normally, then type \`exit\` to stop and
@@ -26,10 +37,12 @@ Notes
 
   Colors, fonts, window chrome and timing come from a config file. Without
   --config, pretti looks for ./pretti.config.json, then ~/.pretti.json, then
-  ~/.config/pretti/config.json, and falls back to its built-in theme. Run
-  \`pretti config\` to write one out with every setting at its default, then
-  edit it and re-render - \`pretti render\` restyles an old capture without
-  recording it again.
+  ~/.config/pretti/config.json, and falls back to its built-in theme. Flags
+  win over the file, and only for that run.
+
+  \`pretti config\` writes a file with every setting at its default. Given
+  settings, it saves them instead of applying them once - \`pretti config --bg
+  '#101014'\` edits the file the same way opening it in an editor would.
 `;
 const COMMANDS = ['record', 'capture', 'render', 'config'];
 function isCommand(value) {
@@ -67,9 +80,14 @@ async function main() {
         process.argv.splice(2, 1);
     // These modules do their work on import, except render, which exports main.
     if (command === 'config') {
+        // Here the flags are the edit, not a one-off override: they are written to
+        // the file rather than applied to a render.
         const file = process.argv[2] ?? 'pretti.config.json';
-        writeDefaultConfig(file);
-        console.log(`Wrote ${file}. Edit it, then run pretti again to use it.`);
+        const patch = overrideArgs();
+        const result = writeConfig(file, patch);
+        console.log(result === 'created'
+            ? `Wrote ${file}. Edit it, or change it with flags: pretti config ${file} --bg '#101014'`
+            : `Updated ${file}: ${patchPaths(patch).join(', ')}`);
     }
     else if (command === 'render') {
         const { main: render } = await import('./render.js');

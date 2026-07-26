@@ -71,16 +71,33 @@ export declare class ConfigError extends Error {
 }
 /** Validates a parsed config object and fills in every key it left out. */
 export declare function resolveConfig(raw: unknown, source?: string): PrettiConfig;
+/** The file's JSON, unvalidated - only the keys it actually sets. */
+export declare function readRawConfig(file: string): Record<string, unknown>;
 export declare function readConfigFile(file: string): PrettiConfig;
 /**
- * Removes `--config <path>` (or `--config=<path>`) from argv, remembering it.
- * Safe to call more than once - only the first call finds anything.
+ * Pulls every `--<setting> <value>` out of argv and returns them as a config
+ * patch. Accepts `--a.b=v` too, and for on/off settings a bare `--a.b` or
+ * `--no-a.b`.
+ */
+export declare function takeOverrideArgs(argv?: string[]): Record<string, unknown>;
+/** The dotted paths a patch actually sets, for reporting back what changed. */
+export declare function patchPaths(patch: Record<string, unknown>, prefix?: string): string[];
+/**
+ * Removes `--config <path>` and every setting flag from argv, remembering
+ * both. Safe to call more than once - only the first call finds anything.
  */
 export declare function takeConfigArg(argv?: string[]): void;
 /** The config file in force, or undefined when the defaults are being used. */
 export declare function configSource(): string | undefined;
-/** The resolved config, read once per process. */
+/** The flags given this run, as a config patch. */
+export declare function overrideArgs(): Record<string, unknown>;
+/** The resolved config - file first, then flags on top - read once per process. */
 export declare function loadConfig(): PrettiConfig;
-/** Writes a config file holding every setting at its default value. */
-export declare function writeDefaultConfig(file: string): void;
+/**
+ * Writes the config file, applying `patch`. A file that already exists is
+ * edited in place and keeps its shape - only the settings named on the command
+ * line change - so this is the same operation as opening it in an editor. A new
+ * file is written out in full, as something to read and edit later.
+ */
+export declare function writeConfig(file: string, patch: Record<string, unknown>): 'created' | 'updated';
 //# sourceMappingURL=config.d.ts.map

@@ -290,7 +290,8 @@ export function resolveConfig(raw: unknown, source = 'config'): PrettiConfig {
   };
 }
 
-export function readConfigFile(file: string): PrettiConfig {
+/** The file's JSON, unvalidated - only the keys it actually sets. */
+export function readRawConfig(file: string): Record<string, unknown> {
   let text: string;
   try {
     text = fs.readFileSync(file, 'utf-8');
@@ -307,7 +308,201 @@ export function readConfigFile(file: string): PrettiConfig {
     throw new ConfigError(`${file} is not valid JSON: ${(error as Error).message}`);
   }
 
-  return resolveConfig(parsed, path.basename(file));
+  if (!isPlainObject(parsed)) {
+    throw new ConfigError(`${path.basename(file)}: expected an object, got ${JSON.stringify(parsed)}`);
+  }
+  return parsed;
+}
+
+export function readConfigFile(file: string): PrettiConfig {
+  return resolveConfig(readRawConfig(file), path.basename(file));
+}
+
+// --- command-line overrides ------------------------------------------------
+//
+// Every setting can also be given as a flag, so a one-off tweak needs no file
+// at all: `pretti --terminal.background '#111' --font.size 24`. The flag name
+// is the path to the setting, which keeps the flags and the file describing
+// the same thing - there is no second vocabulary to learn or keep in sync.
+
+/** Short names for the settings people reach for most. */
+const ALIASES: Record<string, string> = {
+  bg: 'terminal.background',
+  fg: 'terminal.foreground',
+  cursor: 'terminal.cursor.style',
+  palette: 'terminal.palette',
+  'font-size': 'font.size',
+  'font-family': 'font.family',
+  'window-bg': 'window.background',
+  margin: 'window.margin',
+  padding: 'window.padding',
+  radius: 'window.radius',
+  'title-bar': 'window.titleBar.show',
+  fps: 'animation.fps',
+  hold: 'animation.holdMs',
+  quality: 'animation.quality'
+};
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * The default sitting at a dotted path, which is what tells us the shape a
+ * flag's value has to be coerced to. Walking the defaults rather than a second
+ * table of flags means a new setting is spelled out once and gets its flag for
+ * free - and a misspelled path is caught here, named, with its neighbours
+ * listed.
+ */
+function defaultAt(flag: string, keys: string[]): unknown {
+  let node: unknown = DEFAULT_CONFIG;
+  const walked: string[] = [];
+
+  for (const key of keys) {
+    if (!isPlainObject(node) || !(key in node)) {
+      const known = isPlainObject(node) ? Object.keys(node).join(', ') : 'nothing';
+      const where = walked.length ? `${walked.join('.')} has` : 'settings are';
+      throw new ConfigError(`${flag}: unknown setting (${where} ${known})`);
+    }
+    node = node[key];
+    walked.push(key);
+  }
+
+  if (isPlainObject(node)) {
+    throw new ConfigError(
+      `${flag}: needs a specific setting, one of ${Object.keys(node).map((k) => `${keys.join('.')}.${k}`).join(', ')}`
+    );
+  }
+  return node;
+}
+
+/** Reads a flag's text into whatever type the default at that path has. */
+function coerce(flag: string, text: string, fallback: unknown): unknown {
+  if (typeof fallback === 'number') {
+    const value = Number(text);
+    if (!Number.isFinite(value)) throw new ConfigError(`${flag}: expected a number, got "${text}"`);
+    return value;
+  }
+
+  if (typeof fallback === 'boolean') {
+    if (['true', 'yes', 'on', '1'].includes(text)) return true;
+    if (['false', 'no', 'off', '0'].includes(text)) return false;
+    throw new ConfigError(`${flag}: expected true or false, got "${text}"`);
+  }
+
+  if (Array.isArray(fallback)) {
+    // a JSON array if it looks like one, otherwise the comfortable form:
+    // --palette '#111,#f00,...'
+    if (text.trim().startsWith('[')) {
+      try {
+        return JSON.parse(text);
+      } catch {
+        throw new ConfigError(`${flag}: not a valid JSON array: ${text}`);
+      }
+    }
+    return text.split(',').map((entry) => entry.trim());
+  }
+
+  // Strings go through untouched - font.family and window.background are CSS
+  // and may well contain commas.
+  return text;
+}
+
+function setPath(target: Record<string, unknown>, keys: string[], value: unknown): void {
+  let node = target;
+  for (const key of keys.slice(0, -1)) {
+    if (!isPlainObject(node[key])) node[key] = {};
+    node = node[key] as Record<string, unknown>;
+  }
+  node[keys.at(-1)!] = value;
+}
+
+function deepMerge(
+  base: Record<string, unknown>,
+  patch: Record<string, unknown>
+): Record<string, unknown> {
+  const out: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(patch)) {
+    out[key] = isPlainObject(value) && isPlainObject(out[key])
+      ? deepMerge(out[key] as Record<string, unknown>, value)
+      : value;
+  }
+  return out;
+}
+
+/**
+ * Pulls every `--<setting> <value>` out of argv and returns them as a config
+ * patch. Accepts `--a.b=v` too, and for on/off settings a bare `--a.b` or
+ * `--no-a.b`.
+ */
+export function takeOverrideArgs(argv: string[] = process.argv): Record<string, unknown> {
+  const patch: Record<string, unknown> = {};
+
+  for (let i = 2; i < argv.length; ) {
+    const arg = argv[i]!;
+    // --help and --version are the CLI's own, and are left where they are
+    if (!arg.startsWith('--') || arg === '--' || arg === '--help' || arg === '--version') {
+      i++;
+      continue;
+    }
+
+    const equals = arg.indexOf('=');
+    let name = (equals === -1 ? arg.slice(2) : arg.slice(2, equals));
+    let text = equals === -1 ? undefined : arg.slice(equals + 1);
+
+    // --no-x is only a negation if x is really an on/off setting; a setting
+    // whose own name began with "no-" would be resolved by the first lookup.
+    const negated = !ALIASES[name] && name.startsWith('no-');
+    if (negated) name = name.slice(3);
+
+    const keys = (ALIASES[name] ?? name).split('.');
+    const fallback = defaultAt(arg, keys);
+
+    if (typeof fallback === 'boolean' && text === undefined) {
+      // bare flag: --title-bar means on, --no-title-bar means off
+      setPath(patch, keys, !negated);
+      argv.splice(i, 1);
+      continue;
+    }
+
+    if (negated) throw new ConfigError(`${arg}: only on/off settings can be negated`);
+
+    let consumed = 1;
+    if (text === undefined) {
+      text = argv[i + 1];
+      // a value may legitimately look like a flag (a negative number, say), so
+      // only a missing one is an error
+      if (text === undefined) throw new ConfigError(`${arg}: needs a value`);
+      consumed = 2;
+    }
+
+    setPath(patch, keys, coerce(arg, text, fallback));
+    argv.splice(i, consumed);
+  }
+
+  return patch;
+}
+
+/** The dotted paths a patch actually sets, for reporting back what changed. */
+export function patchPaths(patch: Record<string, unknown>, prefix = ''): string[] {
+  return Object.entries(patch).flatMap(([key, value]) =>
+    isPlainObject(value)
+      ? patchPaths(value, `${prefix}${key}.`)
+      : [`${prefix}${key}`]
+  );
+}
+
+/**
+ * Checks a patch on its own, so a bad flag is reported as the flag the user
+ * typed rather than as a line in a file they never edited.
+ */
+function validateOverrides(patch: Record<string, unknown>): void {
+  try {
+    resolveConfig(patch, '');
+  } catch (error) {
+    if (!(error instanceof ConfigError)) throw error;
+    throw new ConfigError(`--${error.message.replace(/^\./, '')}`);
+  }
 }
 
 // --- loading ---------------------------------------------------------------
@@ -317,15 +512,23 @@ export function readConfigFile(file: string): PrettiConfig {
 // fallback in load() covers running a module directly with `node dist/....js`.
 
 let explicitPath: string | undefined;
+let overrides: Record<string, unknown> | undefined;
 let cached: PrettiConfig | undefined;
 let taken = false;
 
 /**
- * Removes `--config <path>` (or `--config=<path>`) from argv, remembering it.
- * Safe to call more than once - only the first call finds anything.
+ * Removes `--config <path>` and every setting flag from argv, remembering
+ * both. Safe to call more than once - only the first call finds anything.
  */
 export function takeConfigArg(argv: string[] = process.argv): void {
   taken = true;
+  takeConfigPath(argv);
+  const patch = takeOverrideArgs(argv);
+  validateOverrides(patch);
+  overrides = patch;
+}
+
+function takeConfigPath(argv: string[]): void {
   for (let i = 2; i < argv.length; i++) {
     const arg = argv[i]!;
     if (arg === '--config') {
@@ -353,18 +556,45 @@ export function configSource(): string | undefined {
   return searchPaths().find((candidate) => fs.existsSync(candidate));
 }
 
-/** The resolved config, read once per process. */
+/** The flags given this run, as a config patch. */
+export function overrideArgs(): Record<string, unknown> {
+  if (!taken) takeConfigArg();
+  return overrides ?? {};
+}
+
+/** The resolved config - file first, then flags on top - read once per process. */
 export function loadConfig(): PrettiConfig {
   if (cached) return cached;
   const source = configSource();
-  cached = source ? readConfigFile(source) : DEFAULT_CONFIG;
+  const raw = source ? readRawConfig(source) : {};
+  cached = resolveConfig(
+    deepMerge(raw, overrideArgs()),
+    source ? path.basename(source) : 'config'
+  );
   return cached;
 }
 
-/** Writes a config file holding every setting at its default value. */
-export function writeDefaultConfig(file: string): void {
-  if (fs.existsSync(file)) {
-    throw new ConfigError(`${file} already exists - delete it first, or pass another path.`);
+/**
+ * Writes the config file, applying `patch`. A file that already exists is
+ * edited in place and keeps its shape - only the settings named on the command
+ * line change - so this is the same operation as opening it in an editor. A new
+ * file is written out in full, as something to read and edit later.
+ */
+export function writeConfig(file: string, patch: Record<string, unknown>): 'created' | 'updated' {
+  const exists = fs.existsSync(file);
+
+  if (exists && Object.keys(patch).length === 0) {
+    throw new ConfigError(
+      `${file} already exists. Name the settings to change (e.g. pretti config ${file} --bg '#101014'), ` +
+      'or delete it to start over.'
+    );
   }
-  fs.writeFileSync(file, JSON.stringify(DEFAULT_CONFIG, null, 2) + '\n');
+
+  const base = exists ? readRawConfig(file) : (DEFAULT_CONFIG as unknown as Record<string, unknown>);
+  const merged = deepMerge(base, patch);
+  // never write a file that would not load
+  resolveConfig(merged, path.basename(file));
+
+  fs.writeFileSync(file, JSON.stringify(merged, null, 2) + '\n');
+  return exists ? 'updated' : 'created';
 }
