@@ -24,7 +24,7 @@ import {
   wrapInChrome,
   write
 } from './render.js';
-import { configSource, loadConfig } from './config.js';
+import { configSource, loadConfig, resolveOutputPath } from './config.js';
 
 const { Terminal } = xtermHeadless;
 
@@ -34,7 +34,7 @@ const config = loadConfig();
 const configFile = configSource();
 if (configFile) console.log(`Using theme from ${configFile}`);
 
-const outFile = process.argv[2] ?? 'output.gif';
+const outFile = resolveOutputPath(config, process.argv[2]);
 const captureFile = process.argv[3] ?? 'capture.jsonl';
 
 const cols = process.stdout.columns ?? COLS;
@@ -103,7 +103,7 @@ const ptyProcess = pty.spawn(os.platform() === 'win32' ? 'powershell.exe' : 'bas
   name: 'xterm-color',
   cols,
   rows,
-  cwd: os.homedir(),
+  cwd: process.cwd(),
   env: process.env
 });
 

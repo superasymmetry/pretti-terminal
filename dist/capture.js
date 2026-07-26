@@ -13,7 +13,7 @@ const ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
     cols,
     rows,
-    cwd: os.homedir(),
+    cwd: process.cwd(),
     env: process.env
 });
 // capture file is line-delimited JSON, one tagged event per line, t in ms

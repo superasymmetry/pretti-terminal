@@ -8,7 +8,7 @@ import xtermHeadless from '@xterm/headless';
 
 import { COLS, ROWS } from './terminal.js';
 import { GifStream } from './gif-stream.js';
-import { ConfigError, configSource, loadConfig, type PrettiConfig } from './config.js';
+import { ConfigError, configSource, loadConfig, resolveOutputPath, type PrettiConfig } from './config.js';
 
 const { Terminal } = xtermHeadless;
 type Terminal = InstanceType<typeof Terminal>;
@@ -200,12 +200,9 @@ export function write(term: Terminal, data: string): Promise<void> {
 // trim event, so every frame is final the moment it is made.
 async function renderToGif(
   events: CaptureEvent[],
-  outDir: string,
   outFile: string,
   config: PrettiConfig
 ): Promise<number> {
-  fs.mkdirSync(outDir, { recursive: true });
-
   // size the emulator to whatever the capture was recorded at; COLS/ROWS only
   // apply to older captures with no meta line
   const meta = events.find((e): e is MetaEvent => e.type === 'meta');
@@ -230,7 +227,6 @@ async function renderToGif(
 
   let lastFrame: string | undefined;
   let lastShot: Buffer | undefined;
-  let shotCount = 0;
 
   try {
     for (const event of events) {
@@ -240,15 +236,12 @@ async function renderToGif(
       await write(term, event.data);
       // snapshot once, then hold it: event.t is deliberately unused
       const frame = snapshot(term, config);
-      const path = `${outDir}/frame_${String(shotCount++).padStart(4, '0')}.png`;
 
       // held frames repeat verbatim; re-screenshotting them is pure waste
       if (frame !== lastFrame || !lastShot) {
         await page.setContent(wrapInChrome(frame, config));
-        lastShot = await page.screenshot({ path, fullPage: true });
+        lastShot = await page.screenshot({ fullPage: true });
         lastFrame = frame;
-      } else {
-        fs.writeFileSync(path, lastShot);
       }
       // passing the same Buffer twice sends a back-reference, not the pixels
       gif.add(lastShot, hold);
@@ -302,8 +295,7 @@ export async function main() {
   const config = loadConfig();
   const source = configSource();
   const inFile = process.argv[2] || 'capture.jsonl';
-  const outFile = process.argv[3] || 'output.gif';
-  const framesDir = 'frames';
+  const outFile = resolveOutputPath(config, process.argv[3]);
 
   if (source) console.log(`Using theme from ${source}`);
 
@@ -311,7 +303,7 @@ export async function main() {
   const events = loadEvents(inFile);
 
   console.log('Replaying, rendering and encoding...');
-  const frames = await renderToGif(events, framesDir, outFile, config);
+  const frames = await renderToGif(events, outFile, config);
 
   if (frames === 0) {
     console.log('Nothing to render, no GIF written.');

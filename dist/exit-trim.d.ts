@@ -1,6 +1,7 @@
 export declare class ExitTracker {
     private typed;
     private lineStart;
+    private armed;
     exitIndex: number | null;
     private couldBecomeExit;
     get cutFloor(): number | null;

@@ -25,15 +25,23 @@ Settings
     pretti --terminal.background '#101014' --font.size 24
     pretti render --animation.fps 15 old.jsonl slow.gif
 
-  Short names for the common ones: --bg, --fg, --cursor, --palette,
-  --font-size, --font-family, --window-bg, --margin, --padding, --radius,
-  --title-bar, --fps, --hold, --quality. On/off settings take a bare flag
-  either way: --no-title-bar, --styles.dim, --no-font.ligatures.
+  Short names for the common ones: --out-dir, --out-name, --bg, --fg,
+  --cursor, --palette, --font-size, --font-family, --window-bg, --margin,
+  --padding, --radius, --title-bar, --fps, --hold, --quality. On/off settings
+  take a bare flag either way: --no-title-bar, --styles.dim,
+  --no-font.ligatures.
 
 Notes
   Recording starts a shell. Use it normally, then type \`exit\` to stop and
   write the GIF. The .jsonl capture is always kept, so you can re-render the
   same session later without re-recording it.
+
+  The GIF lands in the directory you ran from, as output.gif, unless the config
+  says otherwise: output.directory and output.name set where it goes and what
+  it is called, and the directory is created if it does not exist. Naming a
+  file on the command line still wins for that one run.
+
+    pretti config --out-dir '~/Videos/demos' --out-name 'latest.gif'
 
   Colors, fonts, window chrome and timing come from a config file. Without
   --config, pretti looks for ./pretti.config.json, then ~/.pretti.json, then

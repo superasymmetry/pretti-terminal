@@ -57,7 +57,14 @@ export interface AnimationConfig {
     /** gif-encoder-2 quality: 1 is best and slowest, 20 is worst and fastest */
     quality: number;
 }
+export interface OutputConfig {
+    /** where the GIF is written; relative paths are from the directory you ran in */
+    directory: string;
+    /** the file's name. A name with no extension gets `.gif` */
+    name: string;
+}
 export interface PrettiConfig {
+    output: OutputConfig;
     terminal: TerminalConfig;
     font: FontConfig;
     styles: StyleConfig;
@@ -93,6 +100,18 @@ export declare function configSource(): string | undefined;
 export declare function overrideArgs(): Record<string, unknown>;
 /** The resolved config - file first, then flags on top - read once per process. */
 export declare function loadConfig(): PrettiConfig;
+/**
+ * Where the GIF goes: a filename given on the command line if there is one,
+ * otherwise output.directory + output.name from the config. The argument wins
+ * because it is the more specific instruction - the config is the standing
+ * preference, the argument is this one run.
+ *
+ * A named file is taken as written, relative to the directory you ran in; only
+ * the config's own pair is joined. Creates the directory, since a config
+ * pointing at ~/Videos/demos should not fail because the folder is not there
+ * yet.
+ */
+export declare function resolveOutputPath(config: PrettiConfig, explicit?: string): string;
 /**
  * Writes the config file, applying `patch`. A file that already exists is
  * edited in place and keeps its shape - only the settings named on the command

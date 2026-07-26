@@ -11,6 +11,10 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 export const DEFAULT_CONFIG = {
+    output: {
+        directory: '.',
+        name: 'output.gif'
+    },
     terminal: {
         background: '#2b2d3a',
         foreground: '#f8f8f2',
@@ -95,6 +99,19 @@ function css(where, value) {
         fail(where, `expected a string, got ${JSON.stringify(value)}`);
     return value;
 }
+/**
+ * A path fragment. Blank is rejected rather than quietly meaning "the current
+ * directory" or "no name" - it is always a typo, and one that would otherwise
+ * surface much later as a confusing write error.
+ */
+function filePath(where, value) {
+    if (typeof value !== 'string')
+        fail(where, `expected a string, got ${JSON.stringify(value)}`);
+    const text = value.trim();
+    if (!text)
+        fail(where, 'expected a path, got an empty string');
+    return text;
+}
 function num(where, value, min, max) {
     if (typeof value !== 'number' || !Number.isFinite(value)) {
         fail(where, `expected a number, got ${JSON.stringify(value)}`);
@@ -150,9 +167,13 @@ function buttons(where, value) {
 }
 /** Validates a parsed config object and fills in every key it left out. */
 export function resolveConfig(raw, source = 'config') {
-    const top = section(source, raw ?? {}, ['terminal', 'font', 'styles', 'window', 'animation']);
+    const top = section(source, raw ?? {}, ['output', 'terminal', 'font', 'styles', 'window', 'animation']);
     const d = DEFAULT_CONFIG;
     return {
+        output: merge(`${source}.output`, d.output, top.output, {
+            directory: filePath,
+            name: filePath
+        }),
         terminal: merge(`${source}.terminal`, d.terminal, top.terminal, {
             background: color,
             foreground: color,
@@ -230,6 +251,8 @@ export function readConfigFile(file) {
 // the same thing - there is no second vocabulary to learn or keep in sync.
 /** Short names for the settings people reach for most. */
 const ALIASES = {
+    'out-dir': 'output.directory',
+    'out-name': 'output.name',
     bg: 'terminal.background',
     fg: 'terminal.foreground',
     cursor: 'terminal.cursor.style',
@@ -453,6 +476,43 @@ export function loadConfig() {
     const raw = source ? readRawConfig(source) : {};
     cached = resolveConfig(deepMerge(raw, overrideArgs()), source ? path.basename(source) : 'config');
     return cached;
+}
+// --- output path -----------------------------------------------------------
+/** Expands a leading ~ , which a hand-edited config is likely to contain. */
+function expandHome(target) {
+    if (target === '~')
+        return os.homedir();
+    if (target.startsWith('~/') || target.startsWith('~\\')) {
+        return path.join(os.homedir(), target.slice(2));
+    }
+    return target;
+}
+/**
+ * Where the GIF goes: a filename given on the command line if there is one,
+ * otherwise output.directory + output.name from the config. The argument wins
+ * because it is the more specific instruction - the config is the standing
+ * preference, the argument is this one run.
+ *
+ * A named file is taken as written, relative to the directory you ran in; only
+ * the config's own pair is joined. Creates the directory, since a config
+ * pointing at ~/Videos/demos should not fail because the folder is not there
+ * yet.
+ */
+export function resolveOutputPath(config, explicit) {
+    const { directory, name } = config.output;
+    // a name with no extension at all is a name, not a file: `"name": "demo"`
+    // means demo.gif rather than an extensionless file nothing will open
+    const filename = path.extname(name) ? name : `${name}.gif`;
+    const target = explicit
+        ? path.resolve(expandHome(explicit))
+        : path.resolve(expandHome(directory), filename);
+    try {
+        fs.mkdirSync(path.dirname(target), { recursive: true });
+    }
+    catch (error) {
+        throw new ConfigError(`Cannot create ${path.dirname(target)}: ${error.message}`);
+    }
+    return target;
 }
 /**
  * Writes the config file, applying `patch`. A file that already exists is

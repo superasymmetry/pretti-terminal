@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 import xtermHeadless from '@xterm/headless';
 import { COLS, ROWS } from './terminal.js';
 import { GifStream } from './gif-stream.js';
-import { ConfigError, configSource, loadConfig } from './config.js';
+import { ConfigError, configSource, loadConfig, resolveOutputPath } from './config.js';
 const { Terminal } = xtermHeadless;
 export { COLS, ROWS };
 // How long one GIF frame lasts. Recorded timestamps are ignored: each output
@@ -148,8 +148,7 @@ export function write(term, data) {
 // of end to end. The recorder needs a watermark to know when a frame is safe to
 // encode; here there is nothing to wait for - the capture already carries its
 // trim event, so every frame is final the moment it is made.
-async function renderToGif(events, outDir, outFile, config) {
-    fs.mkdirSync(outDir, { recursive: true });
+async function renderToGif(events, outFile, config) {
     // size the emulator to whatever the capture was recorded at; COLS/ROWS only
     // apply to older captures with no meta line
     const meta = events.find((e) => e.type === 'meta');
@@ -171,7 +170,6 @@ async function renderToGif(events, outDir, outFile, config) {
     });
     let lastFrame;
     let lastShot;
-    let shotCount = 0;
     try {
         for (const event of events) {
             if (event.type !== 'out')
@@ -181,15 +179,11 @@ async function renderToGif(events, outDir, outFile, config) {
             await write(term, event.data);
             // snapshot once, then hold it: event.t is deliberately unused
             const frame = snapshot(term, config);
-            const path = `${outDir}/frame_${String(shotCount++).padStart(4, '0')}.png`;
             // held frames repeat verbatim; re-screenshotting them is pure waste
             if (frame !== lastFrame || !lastShot) {
                 await page.setContent(wrapInChrome(frame, config));
-                lastShot = await page.screenshot({ path, fullPage: true });
+                lastShot = await page.screenshot({ fullPage: true });
                 lastFrame = frame;
-            }
-            else {
-                fs.writeFileSync(path, lastShot);
             }
             // passing the same Buffer twice sends a back-reference, not the pixels
             gif.add(lastShot, hold);
@@ -235,14 +229,13 @@ export async function main() {
     const config = loadConfig();
     const source = configSource();
     const inFile = process.argv[2] || 'capture.jsonl';
-    const outFile = process.argv[3] || 'output.gif';
-    const framesDir = 'frames';
+    const outFile = resolveOutputPath(config, process.argv[3]);
     if (source)
         console.log(`Using theme from ${source}`);
     console.log('Loading capture...');
     const events = loadEvents(inFile);
     console.log('Replaying, rendering and encoding...');
-    const frames = await renderToGif(events, framesDir, outFile, config);
+    const frames = await renderToGif(events, outFile, config);
     if (frames === 0) {
         console.log('Nothing to render, no GIF written.');
         return;

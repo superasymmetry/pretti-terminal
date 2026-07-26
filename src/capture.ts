@@ -17,7 +17,7 @@ const ptyProcess = pty.spawn(shell, [], {
   name: 'xterm-color',
   cols,
   rows,
-  cwd: os.homedir(),
+  cwd: process.cwd(),
   env: process.env
 });
 

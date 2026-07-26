@@ -20,6 +20,9 @@ const EXIT_WORDS = ['exit', 'logout'];
 export class ExitTracker {
   private typed = '';
   private lineStart: number | null = null;
+  // Was the last line finished an exit, with nothing typed since? Only that line
+  // can be the one that ended the session - see onInput.
+  private armed = false;
 
   // Index of the first output event belonging to the exit command, or null if
   // the session did not end with one (Ctrl+D, a crash, a kill).
@@ -52,11 +55,25 @@ export class ExitTracker {
   // `outIndex` is how many output events have been logged so far.
   onInput(data: string, outIndex: number): void {
     for (const ch of data) {
+      // The exit that ends the recording is the last thing typed in the session:
+      // the shell is gone, so there is nothing left to type into. An exit still
+      // followed by keystrokes was therefore part of the demo - it closed a
+      // nested shell or a REPL, and the session ended some other way (Ctrl+D,
+      // Ctrl+C, a kill). Disarming here rather than waiting for the next Enter
+      // matters because those endings send no Enter at all: without this, a
+      // demo's `exit` stays armed to the end and the trim eats every frame after
+      // it. Any key counts, so re-arming needs a fresh exit line of its own.
+      if (this.armed) {
+        this.armed = false;
+        this.exitIndex = null;
+      }
+
       if (ch === '\r' || ch === '\n') {
         // Set on every Enter, not just matching ones: typing `exit` somewhere
         // that does not exit (a nested shell, a REPL) must not leave a stale
         // cut point behind for the rest of the session.
-        this.exitIndex = EXIT_LINE.test(this.typed) ? this.lineStart : null;
+        this.armed = EXIT_LINE.test(this.typed);
+        this.exitIndex = this.armed ? this.lineStart : null;
         this.typed = '';
         this.lineStart = null;
         continue;
