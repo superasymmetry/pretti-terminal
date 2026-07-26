@@ -1,0 +1,33 @@
+{"t":0,"type":"meta","cols":120,"rows":30}
+{"t":25,"type":"out","data":"\u001b[?9001h\u001b[?1004h"}
+{"t":117,"type":"out","data":"\u001b[?25l\u001b[2J\u001b[m\u001b[HWindows PowerShell\r\nCopyright (C) Microsoft Corporation. All rights reserved.\u001b]0;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h"}
+{"t":127,"type":"out","data":"\u001b[?25l\u001b[4;1H\u001b[?25h"}
+{"t":305,"type":"out","data":"PS C:\\Users\\stringbot> "}
+{"t":1156,"type":"out","data":"\u001b[?25l"}
+{"t":1174,"type":"out","data":"\u001b[93me\u001b[?25h"}
+{"t":1245,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":1267,"type":"out","data":"\u001b[93m\bec\u001b[?25h"}
+{"t":1394,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":1409,"type":"out","data":"\u001b[93m\u001b[4;24Hecho\u001b[?25h"}
+{"t":1616,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":1625,"type":"out","data":"\u001b[93m\u001b[4;24Hecho \u001b[?25h"}
+{"t":1833,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":1842,"type":"out","data":"\u001b[91m\u001b[4;22H> \u001b[93mecho \u001b[36m\"\u001b[?25h"}
+{"t":2425,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2449,"type":"out","data":"\u001b[93m\u001b[4;24Hecho \u001b[36m\"h\u001b[?25h"}
+{"t":2624,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2638,"type":"out","data":"\u001b[93m\u001b[4;24Hecho \u001b[36m\"hi\u001b[?25h"}
+{"t":2872,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2888,"type":"out","data":"\u001b[4;22H> \u001b[93mecho \u001b[36m\"hi\"\u001b[?25h"}
+{"t":2980,"type":"out","data":"\u001b[m"}
+{"t":2996,"type":"out","data":"\r\n"}
+{"t":3102,"type":"out","data":"hi"}
+{"t":3121,"type":"out","data":"\r\nPS C:\\Users\\stringbot> "}
+{"t":4235,"type":"out","data":"\u001b[?25l"}
+{"t":4249,"type":"out","data":"\u001b[93me\u001b[?25h"}
+{"t":4438,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4453,"type":"out","data":"\u001b[93m\bex\u001b[?25h"}
+{"t":4495,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4515,"type":"out","data":"\u001b[93m\u001b[6;24Hexi\u001b[?25h"}
+{"t":4709,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4732,"type":"out","data":"\u001b[92m\u001b[6;24Hexit\r\n\u001b[?25h"}

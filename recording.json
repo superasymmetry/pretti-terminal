@@ -1,0 +1,18 @@
+[
+  {
+    "t": 355,
+    "data": "\u001b[?9001h\u001b[?1004h"
+  },
+  {
+    "t": 554,
+    "data": "\u001b[?25l\u001b[2J\u001b[m\u001b[HWindows PowerShell\r\nCopyright (C) Microsoft Corporation. All rights reserved.\u001b]0;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h"
+  },
+  {
+    "t": 564,
+    "data": "\u001b[?25l\u001b[4;1H\u001b[?25h"
+  },
+  {
+    "t": 895,
+    "data": "PS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-cli> "
+  }
+]
