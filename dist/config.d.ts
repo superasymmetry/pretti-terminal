@@ -7,6 +7,16 @@ export interface CursorConfig {
     foreground: string;
 }
 export interface TerminalConfig {
+    /**
+     * The widest and tallest the filmed terminal is allowed to be, in cells. A
+     * recording uses your real window when it fits inside these and shrinks to
+     * them when it does not, because the GIF costs roughly its area: a 120x30
+     * window at the old 19px font came to 1.7 million pixels a frame, and a GIF
+     * stores every frame whole. Only `record` and `capture` read these - a
+     * re-render replays whatever geometry its capture was taken at.
+     */
+    cols: number;
+    rows: number;
     background: string;
     foreground: string;
     cursor: CursorConfig;
@@ -58,7 +68,10 @@ export interface AnimationConfig {
     quality: number;
 }
 export interface OutputConfig {
-    /** where the GIF is written; relative paths are from the directory you ran in */
+    /**
+     * where the GIF is written. A leading ~ is your home directory; relative
+     * paths are from the directory you ran in.
+     */
     directory: string;
     /** the file's name. A name with no extension gets `.gif` */
     name: string;

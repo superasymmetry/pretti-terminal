@@ -7,24 +7,38 @@
 // tail of the encode left to drain.
 
 import * as fs from 'node:fs';
-import * as os from 'node:os';
-import * as pty from 'node-pty';
+import * as pty from '@lydell/node-pty';
 
-import { chromium, type Page } from 'playwright';
-import xtermHeadless from '@xterm/headless';
-
-import { COLS, ROWS } from './terminal.js';
-import { ExitTracker } from './exit-trim.js';
-import { GifStream } from './gif-stream.js';
 import {
   VIEWPORT,
   frameIntervalMs,
   holdFrames,
   snapshot,
+  themeColors,
   wrapInChrome,
   write
 } from './render.js';
 import { configSource, loadConfig, resolveOutputPath } from './config.js';
+import { defaultShell, geometry } from './terminal.js';
+
+import { ExitTracker } from './exit-trim.js';
+import { GifStream } from './gif-stream.js';
+import { launchBrowser } from './browser.js';
+import xtermHeadless from '@xterm/headless';
+
+// @lydell/node-pty rather than node-pty itself: same API, but it ships its
+// binaries as per-platform optional dependencies instead of compiling on
+// install, so Linux users do not need Python and a C++ toolchain to install us.
+
+
+
+
+
+
+
+
+
+
 
 const { Terminal } = xtermHeadless;
 
@@ -37,15 +51,15 @@ if (configFile) console.log(`Using theme from ${configFile}`);
 const outFile = resolveOutputPath(config, process.argv[2]);
 const captureFile = process.argv[3] ?? 'capture.jsonl';
 
-const cols = process.stdout.columns ?? COLS;
-const rows = process.stdout.rows ?? ROWS;
+const { cols, rows } = geometry(config);
 
-// Start the browser now, in parallel with the session. Launching Chromium takes
-// a second or two, which is dead time we would otherwise pay at the end.
-const browserPromise = chromium.launch();
-const pagePromise: Promise<Page> = browserPromise.then((browser) =>
-  browser.newPage({ viewport: VIEWPORT })
-);
+// Opened before the shell starts, for the same reason the config is read up
+// there: a browser that cannot be opened should stop us now, rather than after
+// a whole session has been recorded against it. It costs about 200ms, and it is
+// the only place that failure can be reported to someone who is still reading
+// the terminal - once recording begins the screen belongs to the session.
+const browser = await launchBrowser();
+const page = await browser.newPage({ viewport: VIEWPORT });
 
 const term = new Terminal({ cols, rows, allowProposedApi: true });
 const hold = holdFrames(config);
@@ -53,7 +67,12 @@ const hold = holdFrames(config);
 const gif = new GifStream({
   outFile,
   delayMs: frameIntervalMs(config),
-  quality: config.animation.quality
+  quality: config.animation.quality,
+  // No octree here - the encoder has to keep pace with the session, and it is
+  // the slower of the two. Diffing is worth it either way: it costs one pass
+  // over the pixels against the ~72ms the quantiser spends on the same frame.
+  diff: true,
+  themeColors: themeColors(config)
 });
 
 let lastFrame: string | undefined;
@@ -89,7 +108,6 @@ function enqueue(data: string, index: number): void {
 
     // held frames repeat verbatim; re-screenshotting them is pure waste
     if (frame !== lastFrame || !lastShot) {
-      const page = await pagePromise;
       await page.setContent(wrapInChrome(frame, config));
       lastShot = await page.screenshot({ fullPage: true });
       lastFrame = frame;
@@ -99,7 +117,7 @@ function enqueue(data: string, index: number): void {
   });
 }
 
-const ptyProcess = pty.spawn(os.platform() === 'win32' ? 'powershell.exe' : 'bash', [], {
+const ptyProcess = pty.spawn(defaultShell(), [], {
   name: 'xterm-color',
   cols,
   rows,
@@ -148,7 +166,7 @@ ptyProcess.onExit(async ({ exitCode }) => {
   // in the middle of the terminal we are filming.
   console.log('Finishing frames...');
   await queue;
-  await (await browserPromise).close();
+  await browser.close();
 
   // The cut point is final now. Whatever is still pending either belongs to the
   // exit and gets dropped, or was held behind it and can go through - the last
@@ -168,10 +186,10 @@ ptyProcess.onExit(async ({ exitCode }) => {
     process.exit(exitCode);
   }
 
-  console.log(
-    `Finishing GIF (${owed} of ${gif.frameCount} frames left; ` +
-    `${streamed} streamed during the session, ${heldBack} held back to the end)...`
-  );
+  // console.log(
+  //   `Finishing GIF (${owed} of ${gif.frameCount} frames left; ` +
+  //   `${streamed} streamed during the session, ${heldBack} held back to the end)...`
+  // );
 
   const encodeStart = Date.now();
   await gif.finish();

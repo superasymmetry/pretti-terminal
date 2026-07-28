@@ -1,0 +1,31 @@
+# Dependencies. Reinstalled from package-lock.json, and node-pty compiles a
+# native binary for whichever OS ran the install - committing it hands Mac and
+# Linux users a Windows .node file that cannot load.
+node_modules/
+
+# Build output. `npm run build` regenerates it, and the `prepare` script runs
+# that automatically on both `npm install <git-url>` and `npm publish`, so the
+# folder never needs to be in the repo to reach a user.
+dist/
+
+# Recordings. These are what the tool produces, not what it is made of - a
+# demo GIF you actually want in the README should be committed deliberately
+# with `git add -f docs/demo.gif`.
+*.gif
+capture.jsonl
+
+# A local theme, which is per-machine preference rather than project source.
+pretti.config.json
+
+# Playwright's browser download, if it ever lands inside the project.
+.playwright/
+
+# Logs and crash reports from npm itself.
+*.log
+npm-debug.log*
+
+# Editor and OS clutter.
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

@@ -12,10 +12,15 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 export const DEFAULT_CONFIG = {
     output: {
-        directory: '.',
+        // Downloads rather than the directory you ran in: recording happens inside
+        // whatever project you are demoing, and a GIF is not one of its files.
+        // Written as ~ so a config file stays portable between machines.
+        directory: '~/Downloads',
         name: 'output.gif'
     },
     terminal: {
+        cols: 100,
+        rows: 28,
         background: '#2b2d3a',
         foreground: '#f8f8f2',
         cursor: {
@@ -32,7 +37,10 @@ export const DEFAULT_CONFIG = {
     },
     font: {
         family: "'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace",
-        size: 19,
+        // Every point of this is paid for twice over, in width and in height, by
+        // every frame. 15px is still comfortably readable at full size and costs
+        // about a third less area than the 19px this used to be.
+        size: 15,
         lineHeight: 1.55,
         letterSpacing: '.02em',
         ligatures: false
@@ -175,6 +183,8 @@ export function resolveConfig(raw, source = 'config') {
             name: filePath
         }),
         terminal: merge(`${source}.terminal`, d.terminal, top.terminal, {
+            cols: (w, v) => num(w, v, 20, 500),
+            rows: (w, v) => num(w, v, 5, 200),
             background: color,
             foreground: color,
             cursor: (where, value) => merge(where, d.terminal.cursor, value, {
@@ -253,6 +263,8 @@ export function readConfigFile(file) {
 const ALIASES = {
     'out-dir': 'output.directory',
     'out-name': 'output.name',
+    cols: 'terminal.cols',
+    rows: 'terminal.rows',
     bg: 'terminal.background',
     fg: 'terminal.foreground',
     cursor: 'terminal.cursor.style',

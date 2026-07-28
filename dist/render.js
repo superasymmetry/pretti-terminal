@@ -1,9 +1,9 @@
 // render.ts
 import * as fs from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { chromium } from 'playwright';
 import xtermHeadless from '@xterm/headless';
 import { COLS, ROWS } from './terminal.js';
+import { launchBrowser } from './browser.js';
 import { GifStream } from './gif-stream.js';
 import { ConfigError, configSource, loadConfig, resolveOutputPath } from './config.js';
 const { Terminal } = xtermHeadless;
@@ -161,12 +161,17 @@ async function renderToGif(events, outFile, config) {
     // captures made before this existed have no trim event and render in full
     const trim = events.find((e) => e.type === 'trim');
     let outIndex = 0;
-    const browser = await chromium.launch();
+    const browser = await launchBrowser();
     const page = await browser.newPage({ viewport: VIEWPORT });
     const gif = new GifStream({
         outFile,
         delayMs: frameIntervalMs(config),
-        quality: config.animation.quality
+        quality: config.animation.quality,
+        // Same settings the recorder uses. An offline render could afford the
+        // slower octree quantiser, but not alongside diffing - see GifOptions -
+        // and diffing is worth an order of magnitude more than octree is.
+        diff: true,
+        themeColors: themeColors(config)
     });
     let lastFrame;
     let lastShot;
@@ -193,6 +198,27 @@ async function renderToGif(events, outFile, config) {
         await browser.close();
     }
     return gif.finish();
+}
+/**
+ * Every colour the theme can put on a pixel, for choosing a transparent colour
+ * that collides with none of them.
+ *
+ * The terminal's own colours are the ones that matter: they are what changes
+ * between frames, and a collision only shows as a ghost where something
+ * changed. The window chrome is here for good measure - it is identical in
+ * every frame, so it would be transparent regardless.
+ */
+export function themeColors(config) {
+    const { terminal, window: win } = config;
+    return [
+        terminal.background,
+        terminal.foreground,
+        terminal.cursor.background,
+        terminal.cursor.foreground,
+        ...terminal.palette,
+        win.titleBar.background,
+        ...win.titleBar.buttons
+    ];
 }
 export function wrapInChrome(terminalHtml, config) {
     const { terminal, font, window: win } = config;

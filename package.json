@@ -1,7 +1,7 @@
 {
   "name": "pretti-cli",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -10,22 +10,23 @@
     "pretti": "dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "scripts"
   ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "npm run build && node dist/cli.js",
     "prepare": "npm run build",
-    "postinstall": "playwright install chromium",
+    "postinstall": "node scripts/install-browser.js",
     "record": "node dist/cli.js record",
     "capture": "node dist/cli.js capture",
     "render": "node dist/cli.js render"
   },
   "dependencies": {
+    "@lydell/node-pty": "^1.2.0-beta.14",
     "@xterm/headless": "^6.0.0",
     "gif-encoder-2": "^1.0.5",
-    "node-pty": "^1.1.0",
     "playwright": "^1.62.0",
     "pngjs": "^7.0.0"
   },

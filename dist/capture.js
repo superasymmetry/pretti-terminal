@@ -1,14 +1,15 @@
 import * as fs from 'node:fs';
-import * as os from 'node:os';
-import * as pty from 'node-pty';
-import { COLS, ROWS } from './terminal.js';
+// see record.ts on why this is the fork and not node-pty itself
+import * as pty from '@lydell/node-pty';
+import { defaultShell, geometry } from './terminal.js';
+import { loadConfig } from './config.js';
 import { ExitTracker } from './exit-trim.js';
-const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
+const shell = defaultShell();
 const outFile = process.argv[2] ?? 'capture.jsonl';
-// record at the real window size; COLS/ROWS are only a fallback for when
-// stdout is not a terminal (piped output, CI)
-const cols = process.stdout.columns ?? COLS;
-const rows = process.stdout.rows ?? ROWS;
+// The geometry caps are the only thing a bare capture takes from the config -
+// it draws nothing - but they have to be honoured here too. They are baked into
+// the `meta` line below, and a later render replays at whatever it finds there.
+const { cols, rows } = geometry(loadConfig());
 const ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
     cols,
