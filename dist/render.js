@@ -18,13 +18,42 @@ export function frameIntervalMs(config) {
 export function holdFrames(config) {
     return Math.max(1, Math.round(config.animation.holdMs / frameIntervalMs(config)));
 }
-function loadEvents(path) {
-    return fs.readFileSync(path, 'utf-8')
-        .trim()
-        .split('\n')
-        .map((line) => {
+/**
+ * Reads a .jsonl capture. Both failures here are things a user does rather than
+ * bugs - naming a file that is not there, or pointing at one that is not a
+ * capture - so they are reported the way a bad config is, with a message
+ * instead of a stack.
+ */
+function loadEvents(file) {
+    let text;
+    try {
+        text = fs.readFileSync(file, 'utf-8');
+    }
+    catch (error) {
+        // A missing file is the common case by a distance, and the useful thing to
+        // say is where captures come from - not to repeat the errno back.
+        if (error.code === 'ENOENT') {
+            throw new ConfigError(`No capture at ${file}.\n` +
+                'Record one with `pretti capture`, or name an existing .jsonl: pretti render mine.jsonl');
+        }
+        throw new ConfigError(`Cannot read capture ${file}: ${error.message}`);
+    }
+    const lines = text.trim().split('\n');
+    if (lines.length === 1 && lines[0] === '') {
+        throw new ConfigError(`${file} is empty - there is nothing in it to render.`);
+    }
+    return lines.map((line, i) => {
+        let event;
+        try {
+            event = JSON.parse(line);
+        }
+        catch {
+            // Named by line, since the whole point of .jsonl is that one bad line is
+            // findable. Usually this is not a capture at all - a .json config, say.
+            throw new ConfigError(`${file} is not a capture: line ${i + 1} is not valid JSON.\n` +
+                'A capture is the .jsonl file pretti writes while recording.');
+        }
         // captures predating tagged events had no `type` and were all output
-        const event = JSON.parse(line);
         return (event.type ? event : { ...event, type: 'out' });
     });
 }

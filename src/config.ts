@@ -1,13 +1,3 @@
-// config.ts - the look of the GIF, in one editable file.
-//
-// Everything the renderer draws that is not the text itself lives here: the
-// terminal palette, the font, the window chrome around it, and the pace of the
-// animation. render.ts and record.ts both read the same resolved config, so a
-// live recording and a later re-render of the same capture come out identical.
-//
-// Nothing is required. A config file may set one key or fifty; whatever it
-// leaves out falls back to DEFAULT_CONFIG.
-
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -22,14 +12,6 @@ export interface CursorConfig {
 }
 
 export interface TerminalConfig {
-  /**
-   * The widest and tallest the filmed terminal is allowed to be, in cells. A
-   * recording uses your real window when it fits inside these and shrinks to
-   * them when it does not, because the GIF costs roughly its area: a 120x30
-   * window at the old 19px font came to 1.7 million pixels a frame, and a GIF
-   * stores every frame whole. Only `record` and `capture` read these - a
-   * re-render replays whatever geometry its capture was taken at.
-   */
   cols: number;
   rows: number;
   background: string;
@@ -89,10 +71,6 @@ export interface AnimationConfig {
 }
 
 export interface OutputConfig {
-  /**
-   * where the GIF is written. A leading ~ is your home directory; relative
-   * paths are from the directory you ran in.
-   */
   directory: string;
   /** the file's name. A name with no extension gets `.gif` */
   name: string;
@@ -109,9 +87,6 @@ export interface PrettiConfig {
 
 export const DEFAULT_CONFIG: PrettiConfig = {
   output: {
-    // Downloads rather than the directory you ran in: recording happens inside
-    // whatever project you are demoing, and a GIF is not one of its files.
-    // Written as ~ so a config file stays portable between machines.
     directory: '~/Downloads',
     name: 'output.gif'
   },
@@ -134,9 +109,6 @@ export const DEFAULT_CONFIG: PrettiConfig = {
   },
   font: {
     family: "'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace",
-    // Every point of this is paid for twice over, in width and in height, by
-    // every frame. 15px is still comfortably readable at full size and costs
-    // about a third less area than the 19px this used to be.
     size: 15,
     lineHeight: 1.55,
     letterSpacing: '.02em',
@@ -181,11 +153,6 @@ export function searchPaths(): string[] {
 export class ConfigError extends Error {}
 
 // --- validation ------------------------------------------------------------
-//
-// A config is hand-edited, so a typo is the expected failure, not the strange
-// one. Every check names the key it failed on, and an unknown key is an error
-// rather than a silent no-op - misspelling `backgruond` should not look like
-// the setting simply had no effect.
 
 function fail(where: string, message: string): never {
   throw new ConfigError(`${where}: ${message}`);
@@ -193,7 +160,6 @@ function fail(where: string, message: string): never {
 
 const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
 
-/** Expands #abc to #aabbcc so downstream code only ever sees one shape. */
 function color(where: string, value: unknown): string {
   if (typeof value !== 'string' || !HEX.test(value.trim())) {
     fail(where, `expected a hex color like "#1a2b3c", got ${JSON.stringify(value)}`);
@@ -204,17 +170,11 @@ function color(where: string, value: unknown): string {
     : hex;
 }
 
-/** For CSS values we hand to the browser verbatim - gradients, shadows, fonts. */
 function css(where: string, value: unknown): string {
   if (typeof value !== 'string') fail(where, `expected a string, got ${JSON.stringify(value)}`);
   return value as string;
 }
 
-/**
- * A path fragment. Blank is rejected rather than quietly meaning "the current
- * directory" or "no name" - it is always a typo, and one that would otherwise
- * surface much later as a confusing write error.
- */
 function filePath(where: string, value: unknown): string {
   if (typeof value !== 'string') fail(where, `expected a string, got ${JSON.stringify(value)}`);
   const text = (value as string).trim();
@@ -402,13 +362,6 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/**
- * The default sitting at a dotted path, which is what tells us the shape a
- * flag's value has to be coerced to. Walking the defaults rather than a second
- * table of flags means a new setting is spelled out once and gets its flag for
- * free - and a misspelled path is caught here, named, with its neighbours
- * listed.
- */
 function defaultAt(flag: string, keys: string[]): unknown {
   let node: unknown = DEFAULT_CONFIG;
   const walked: string[] = [];
@@ -431,7 +384,6 @@ function defaultAt(flag: string, keys: string[]): unknown {
   return node;
 }
 
-/** Reads a flag's text into whatever type the default at that path has. */
 function coerce(flag: string, text: string, fallback: unknown): unknown {
   if (typeof fallback === 'number') {
     const value = Number(text);
@@ -446,8 +398,6 @@ function coerce(flag: string, text: string, fallback: unknown): unknown {
   }
 
   if (Array.isArray(fallback)) {
-    // a JSON array if it looks like one, otherwise the comfortable form:
-    // --palette '#111,#f00,...'
     if (text.trim().startsWith('[')) {
       try {
         return JSON.parse(text);
@@ -458,8 +408,6 @@ function coerce(flag: string, text: string, fallback: unknown): unknown {
     return text.split(',').map((entry) => entry.trim());
   }
 
-  // Strings go through untouched - font.family and window.background are CSS
-  // and may well contain commas.
   return text;
 }
 
@@ -485,11 +433,7 @@ function deepMerge(
   return out;
 }
 
-/**
- * Pulls every `--<setting> <value>` out of argv and returns them as a config
- * patch. Accepts `--a.b=v` too, and for on/off settings a bare `--a.b` or
- * `--no-a.b`.
- */
+
 export function takeOverrideArgs(argv: string[] = process.argv): Record<string, unknown> {
   const patch: Record<string, unknown> = {};
 
@@ -505,8 +449,6 @@ export function takeOverrideArgs(argv: string[] = process.argv): Record<string, 
     let name = (equals === -1 ? arg.slice(2) : arg.slice(2, equals));
     let text = equals === -1 ? undefined : arg.slice(equals + 1);
 
-    // --no-x is only a negation if x is really an on/off setting; a setting
-    // whose own name began with "no-" would be resolved by the first lookup.
     const negated = !ALIASES[name] && name.startsWith('no-');
     if (negated) name = name.slice(3);
 
@@ -561,20 +503,13 @@ function validateOverrides(patch: Record<string, unknown>): void {
 }
 
 // --- loading ---------------------------------------------------------------
-//
-// record/capture/render each read process.argv positionally, so `--config` is
-// pulled out of argv before they see it. cli.ts does that up front; the
-// fallback in load() covers running a module directly with `node dist/....js`.
 
 let explicitPath: string | undefined;
 let overrides: Record<string, unknown> | undefined;
 let cached: PrettiConfig | undefined;
 let taken = false;
 
-/**
- * Removes `--config <path>` and every setting flag from argv, remembering
- * both. Safe to call more than once - only the first call finds anything.
- */
+
 export function takeConfigArg(argv: string[] = process.argv): void {
   taken = true;
   takeConfigPath(argv);
@@ -640,21 +575,9 @@ function expandHome(target: string): string {
   return target;
 }
 
-/**
- * Where the GIF goes: a filename given on the command line if there is one,
- * otherwise output.directory + output.name from the config. The argument wins
- * because it is the more specific instruction - the config is the standing
- * preference, the argument is this one run.
- *
- * A named file is taken as written, relative to the directory you ran in; only
- * the config's own pair is joined. Creates the directory, since a config
- * pointing at ~/Videos/demos should not fail because the folder is not there
- * yet.
- */
+
 export function resolveOutputPath(config: PrettiConfig, explicit?: string): string {
   const { directory, name } = config.output;
-  // a name with no extension at all is a name, not a file: `"name": "demo"`
-  // means demo.gif rather than an extensionless file nothing will open
   const filename = path.extname(name) ? name : `${name}.gif`;
 
   const target = explicit
@@ -669,12 +592,7 @@ export function resolveOutputPath(config: PrettiConfig, explicit?: string): stri
   return target;
 }
 
-/**
- * Writes the config file, applying `patch`. A file that already exists is
- * edited in place and keeps its shape - only the settings named on the command
- * line change - so this is the same operation as opening it in an editor. A new
- * file is written out in full, as something to read and edit later.
- */
+
 export function writeConfig(file: string, patch: Record<string, unknown>): 'created' | 'updated' {
   const exists = fs.existsSync(file);
 

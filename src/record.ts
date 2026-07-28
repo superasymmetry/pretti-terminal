@@ -19,7 +19,7 @@ import {
   write
 } from './render.js';
 import { configSource, loadConfig, resolveOutputPath } from './config.js';
-import { defaultShell, geometry } from './terminal.js';
+import { defaultShell, geometry, requireInteractiveTerminal } from './terminal.js';
 
 import { ExitTracker } from './exit-trim.js';
 import { GifStream } from './gif-stream.js';
@@ -41,6 +41,10 @@ import xtermHeadless from '@xterm/headless';
 
 
 const { Terminal } = xtermHeadless;
+
+// First of all, and before the browser below: recording needs a terminal to
+// read keystrokes from, and without one there is nothing here worth starting.
+requireInteractiveTerminal();
 
 // Read before the shell starts, so a broken config fails now rather than after
 // a whole session has been recorded against it.

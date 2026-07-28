@@ -1,9 +1,3 @@
-// gif-stream.ts - feed frames to the encoder while they are still being made.
-//
-// A GIF is written front to back and cannot be un-written, so a frame can only
-// be handed over once it is certain to survive the exit trim. The recorder
-// decides that; this just carries the frames across to the worker in order.
-
 import { Worker } from 'node:worker_threads';
 
 import type { GifOptions, GifRequest, GifResponse } from './gif-worker.js';
@@ -29,23 +23,14 @@ export class GifStream {
       this.worker.on('error', reject);
     });
   }
-
-  // How many frames the GIF holds so far. Counted here rather than asked of the
-  // worker, so the recorder can tell an empty recording from a real one without
-  // waiting on a round trip.
   get frameCount(): number {
     return this.frames;
   }
 
-  // How many of those the worker has actually encoded. The gap between this and
-  // frameCount is the only work an exit still has to wait for.
   get pendingCount(): number {
     return this.frames - this.encoded;
   }
 
-  // `repeat` copies of one screenshot. Handing over the same Buffer as last time
-  // sends a back-reference instead of the pixels, so a frame held across several
-  // output events crosses the thread boundary once.
   add(shot: Buffer, repeat: number): void {
     if (repeat <= 0) return;
 
@@ -58,8 +43,6 @@ export class GifStream {
     this.frames += repeat;
   }
 
-  // Resolves once the .gif is closed on disk. Returns the frame count the
-  // encoder actually wrote.
   async finish(): Promise<number> {
     this.worker.postMessage({ type: 'finish' } satisfies GifRequest);
     try {

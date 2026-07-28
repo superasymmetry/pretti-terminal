@@ -6,18 +6,21 @@
 // in the idle time while you type. When the shell exits there is usually just the
 // tail of the encode left to drain.
 import * as fs from 'node:fs';
+import * as pty from '@lydell/node-pty';
+import { VIEWPORT, frameIntervalMs, holdFrames, snapshot, themeColors, wrapInChrome, write } from './render.js';
+import { configSource, loadConfig, resolveOutputPath } from './config.js';
+import { defaultShell, geometry, requireInteractiveTerminal } from './terminal.js';
+import { ExitTracker } from './exit-trim.js';
+import { GifStream } from './gif-stream.js';
+import { launchBrowser } from './browser.js';
+import xtermHeadless from '@xterm/headless';
 // @lydell/node-pty rather than node-pty itself: same API, but it ships its
 // binaries as per-platform optional dependencies instead of compiling on
 // install, so Linux users do not need Python and a C++ toolchain to install us.
-import * as pty from '@lydell/node-pty';
-import xtermHeadless from '@xterm/headless';
-import { defaultShell, geometry } from './terminal.js';
-import { launchBrowser } from './browser.js';
-import { ExitTracker } from './exit-trim.js';
-import { GifStream } from './gif-stream.js';
-import { VIEWPORT, frameIntervalMs, holdFrames, snapshot, themeColors, wrapInChrome, write } from './render.js';
-import { configSource, loadConfig, resolveOutputPath } from './config.js';
 const { Terminal } = xtermHeadless;
+// First of all, and before the browser below: recording needs a terminal to
+// read keystrokes from, and without one there is nothing here worth starting.
+requireInteractiveTerminal();
 // Read before the shell starts, so a broken config fails now rather than after
 // a whole session has been recorded against it.
 const config = loadConfig();
@@ -143,8 +146,10 @@ ptyProcess.onExit(async ({ exitCode }) => {
         await gif.finish();
         process.exit(exitCode);
     }
-    console.log(`Finishing GIF (${owed} of ${gif.frameCount} frames left; ` +
-        `${streamed} streamed during the session, ${heldBack} held back to the end)...`);
+    // console.log(
+    //   `Finishing GIF (${owed} of ${gif.frameCount} frames left; ` +
+    //   `${streamed} streamed during the session, ${heldBack} held back to the end)...`
+    // );
     const encodeStart = Date.now();
     await gif.finish();
     const waited = ((Date.now() - encodeStart) / 1000).toFixed(1);

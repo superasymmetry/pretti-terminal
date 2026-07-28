@@ -1,96 +1,67 @@
 {"t":0,"type":"meta","cols":100,"rows":28}
-{"t":65,"type":"out","data":"\u001b[?9001h\u001b[?1004h"}
-{"t":175,"type":"out","data":"\u001b[?25l\u001b[2J\u001b[m\u001b[HWindows PowerShell\r\nCopyright (C) Microsoft Corporation. All rights reserved.\u001b]0;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h"}
-{"t":192,"type":"out","data":"\u001b[?25l\u001b[4;1H\u001b[?25h"}
-{"t":344,"type":"out","data":"PS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-cli> "}
-{"t":842,"type":"out","data":"\u001b[?25l"}
-{"t":861,"type":"out","data":"\u001b[93me\u001b[?25h"}
-{"t":1036,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":1050,"type":"out","data":"\u001b[93m\bec\u001b[?25h"}
-{"t":1225,"type":"out","data":"\u001b[m\u001b[?25l\u001b[93m\u001b[4;64Hech\u001b[?25h"}
-{"t":1238,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":1249,"type":"out","data":"\u001b[93m\u001b[4;64Hecho\u001b[?25h"}
-{"t":1396,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":1419,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[?25h"}
-{"t":1617,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":1638,"type":"out","data":"\u001b[91m\u001b[4;62H> \u001b[93mecho \u001b[36m\"\u001b[?25h"}
-{"t":1835,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":1857,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"t\u001b[?25h"}
-{"t":1940,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":1951,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"th\u001b[?25h"}
-{"t":1998,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2013,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"thi\u001b[?25h"}
-{"t":2102,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2123,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this\u001b[?25h"}
-{"t":2173,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2186,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this \u001b[?25h"}
-{"t":2270,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2279,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this i\u001b[?25h"}
+{"t":97,"type":"out","data":"\u001b[?9001h\u001b[?1004h"}
+{"t":214,"type":"out","data":"\u001b[?25l\u001b[2J\u001b[m\u001b[HWindows PowerShell\r\nCopyright (C) Microsoft Corporation. All rights reserved.\u001b]0;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h"}
+{"t":232,"type":"out","data":"\u001b[?25l\u001b[4;1H\u001b[?25h"}
+{"t":457,"type":"out","data":"PS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-cli> "}
+{"t":1913,"type":"out","data":"\u001b[?25l"}
+{"t":1925,"type":"out","data":"\u001b[93me\u001b[?25h"}
+{"t":2087,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2097,"type":"out","data":"\u001b[93m\bec\u001b[?25h"}
+{"t":2166,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2190,"type":"out","data":"\u001b[93m\u001b[4;64Hech\u001b[?25h"}
+{"t":2221,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2236,"type":"out","data":"\u001b[93m\u001b[4;64Hecho\u001b[?25h"}
 {"t":2330,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2342,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is\u001b[?25h"}
-{"t":2419,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2433,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is \u001b[?25h"}
-{"t":2557,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2570,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is t\u001b[?25h"}
-{"t":2622,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2633,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is th\u001b[?25h"}
-{"t":2692,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2711,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the\u001b[?25h"}
-{"t":2820,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2833,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the \u001b[?25h"}
-{"t":2920,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2943,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the g\u001b[?25h"}
-{"t":3019,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3037,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the gr\u001b[?25h"}
-{"t":3172,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3194,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the gre\u001b[?25h"}
-{"t":3329,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3352,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the grea\u001b[?25h"}
-{"t":3416,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3429,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the great\u001b[?25h"}
-{"t":3522,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3539,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greate\u001b[?25h"}
-{"t":3662,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3678,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greates\u001b[?25h"}
-{"t":3789,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3802,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest\u001b[?25h"}
-{"t":3935,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3958,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest \u001b[?25h"}
-{"t":4067,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4085,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest t\u001b[?25h"}
-{"t":4126,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4146,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest th\u001b[?25h"}
-{"t":4202,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4224,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest thi\u001b[?25h"}
-{"t":4282,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4303,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest thin\u001b[?25h"}
-{"t":4330,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4349,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest thing\u001b[?25h"}
-{"t":4420,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4442,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest thing \u001b[?25h"}
-{"t":4537,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4550,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest thing e\u001b[?25h"}
-{"t":4957,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4970,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest thing ev\u001b[?25h"}
-{"t":5107,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":5125,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest thing eve\u001b[?25h"}
-{"t":5215,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":5233,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"this is the greatest thing ever\u001b[?25h"}
-{"t":5465,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":5482,"type":"out","data":"\u001b[4;62H> \u001b[93mecho \u001b[36m\"this is the greatest thing ever\"\u001b[?25h"}
-{"t":5683,"type":"out","data":"\u001b[m"}
-{"t":5702,"type":"out","data":"\r\n"}
-{"t":5830,"type":"out","data":"this is the greatest thing ever"}
-{"t":5839,"type":"out","data":"\r\n"}
-{"t":5860,"type":"out","data":"PS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-cli> "}
-{"t":6648,"type":"out","data":"\u001b[?25l"}
-{"t":6665,"type":"out","data":"\u001b[93me\u001b[?25h"}
-{"t":6919,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":6931,"type":"out","data":"\u001b[93m\bex\u001b[?25h"}
-{"t":7050,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":7069,"type":"out","data":"\u001b[93m\u001b[7;64Hexi\u001b[?25h"}
-{"t":7185,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":7210,"type":"out","data":"\u001b[92m\u001b[7;64Hexit\u001b[?25h"}
-{"t":7319,"type":"out","data":"\u001b[m"}
-{"t":7334,"type":"out","data":"\r\n"}
-{"t":8385,"type":"trim","index":84}
+{"t":2344,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[?25h"}
+{"t":2505,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2517,"type":"out","data":"\u001b[91m\u001b[4;62H> \u001b[93mecho \u001b[36m\"\u001b[?25h"}
+{"t":2687,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2702,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"d\u001b[?25h"}
+{"t":2852,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2875,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"de\u001b[?25h"}
+{"t":2989,"type":"out","data":"\u001b[?25l\u001b[m\u001b[93m\u001b[4;64Hecho \u001b[36m\"dem"}
+{"t":2998,"type":"out","data":"\u001b[m\u001b[?25h"}
+{"t":3074,"type":"out","data":"\u001b[?25l"}
+{"t":3093,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo\u001b[?25h"}
+{"t":3258,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3282,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo \u001b[?25h"}
+{"t":3444,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3466,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo g\u001b[?25h"}
+{"t":3526,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3545,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo gi\u001b[?25h"}
+{"t":3810,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3825,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo gif\u001b[?25h"}
+{"t":4078,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4090,"type":"out","data":"\u001b[4;62H> \u001b[93mecho \u001b[36m\"demo gif\"\u001b[?25h"}
+{"t":4313,"type":"out","data":"\u001b[m"}
+{"t":4325,"type":"out","data":"\r\n"}
+{"t":4495,"type":"out","data":"demo gif"}
+{"t":4510,"type":"out","data":"\r\nPS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-cli> "}
+{"t":5002,"type":"out","data":"\u001b[?25l"}
+{"t":5022,"type":"out","data":"\u001b[93me\u001b[?25h"}
+{"t":5271,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":5286,"type":"out","data":"\u001b[93m\bei\u001b[?25h"}
+{"t":5621,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":5642,"type":"out","data":"\u001b[93m\u001b[6;64He \b\u001b[?25h"}
+{"t":5736,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":5750,"type":"out","data":"\u001b[93m\bex\u001b[?25h"}
+{"t":5820,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":5829,"type":"out","data":"\u001b[93m\u001b[6;64Hexi\u001b[?25h"}
+{"t":5945,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":5956,"type":"out","data":"\u001b[93m\u001b[6;64Hexis\u001b[?25h"}
+{"t":6058,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":6078,"type":"out","data":"\u001b[93m\u001b[6;64Hexist\u001b[?25h"}
+{"t":6095,"type":"out","data":"\u001b[?25l\u001b[m\u001b[93m\u001b[6;64Hexists\u001b[?25h"}
+{"t":6472,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":6484,"type":"out","data":"\u001b[93m\u001b[6;64Hexist \b\u001b[?25h"}
+{"t":6612,"type":"out","data":"\u001b[?25l\u001b[m\u001b[93m\u001b[6;64Hexis"}
+{"t":6626,"type":"out","data":"\u001b[m \b\u001b[?25h"}
+{"t":6772,"type":"out","data":"\u001b[?25l"}
+{"t":6779,"type":"out","data":"\u001b[93m\u001b[6;64Hexi"}
+{"t":6796,"type":"out","data":"\u001b[m "}
+{"t":6826,"type":"out","data":"\b\u001b[?25h"}
+{"t":6875,"type":"out","data":"\u001b[?25l"}
+{"t":6889,"type":"out","data":"\u001b[92m\u001b[6;64Hexit"}
+{"t":6906,"type":"out","data":"\u001b[m\u001b[?25h"}
+{"t":7059,"type":"out","data":"\r\n"}
+{"t":8070,"type":"trim","index":38}

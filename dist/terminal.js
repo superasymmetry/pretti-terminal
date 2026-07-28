@@ -1,3 +1,4 @@
+import { ConfigError } from './config.js';
 // Capture and render must agree on terminal geometry: the shell wraps its
 // output to these dimensions, and the replay emulator must use the same ones
 // or long lines break in different places.
@@ -20,6 +21,27 @@ export function geometry(config) {
         cols: Math.min(process.stdout.columns ?? COLS, config.terminal.cols),
         rows: Math.min(process.stdout.rows ?? ROWS, config.terminal.rows)
     };
+}
+/**
+ * Stops before anything is started when there is no terminal to record from.
+ *
+ * Recording puts stdin in raw mode, so every keystroke reaches the shell being
+ * filmed instead of being buffered into lines - and raw mode only exists on a
+ * TTY. Piped or redirected input has no setRawMode at all, so without this the
+ * session dies on a TypeError from inside node, several steps after the point
+ * where the real answer ("run this in a terminal") was still obvious.
+ *
+ * Called before the browser is opened and before the shell is spawned: this is
+ * not a recoverable condition, and there is no reason to leave either of them
+ * running while we work that out.
+ */
+export function requireInteractiveTerminal() {
+    if (process.stdin.isTTY)
+        return;
+    throw new ConfigError('pretti records a live terminal session, and its input is not coming from a terminal.\n' +
+        'Run pretti straight from your shell, rather than with its input piped or redirected.\n\n' +
+        'To make a GIF without recording anything, render one from a capture you already have:\n\n' +
+        '    pretti render capture.jsonl out.gif');
 }
 /**
  * The shell to film. A recording is meant to look like the user's own terminal,

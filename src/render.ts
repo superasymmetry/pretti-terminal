@@ -50,15 +50,48 @@ interface TrimEvent {
 
 type CaptureEvent = MetaEvent | OutputEvent | TrimEvent;
 
-function loadEvents(path: string): CaptureEvent[] {
-  return fs.readFileSync(path, 'utf-8')
-    .trim()
-    .split('\n')
-    .map((line) => {
-      // captures predating tagged events had no `type` and were all output
-      const event = JSON.parse(line);
-      return (event.type ? event : { ...event, type: 'out' }) as CaptureEvent;
-    });
+/**
+ * Reads a .jsonl capture. Both failures here are things a user does rather than
+ * bugs - naming a file that is not there, or pointing at one that is not a
+ * capture - so they are reported the way a bad config is, with a message
+ * instead of a stack.
+ */
+function loadEvents(file: string): CaptureEvent[] {
+  let text: string;
+  try {
+    text = fs.readFileSync(file, 'utf-8');
+  } catch (error) {
+    // A missing file is the common case by a distance, and the useful thing to
+    // say is where captures come from - not to repeat the errno back.
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new ConfigError(
+        `No capture at ${file}.\n` +
+        'Record one with `pretti capture`, or name an existing .jsonl: pretti render mine.jsonl'
+      );
+    }
+    throw new ConfigError(`Cannot read capture ${file}: ${(error as Error).message}`);
+  }
+
+  const lines = text.trim().split('\n');
+  if (lines.length === 1 && lines[0] === '') {
+    throw new ConfigError(`${file} is empty - there is nothing in it to render.`);
+  }
+
+  return lines.map((line, i) => {
+    let event: { type?: string };
+    try {
+      event = JSON.parse(line);
+    } catch {
+      // Named by line, since the whole point of .jsonl is that one bad line is
+      // findable. Usually this is not a capture at all - a .json config, say.
+      throw new ConfigError(
+        `${file} is not a capture: line ${i + 1} is not valid JSON.\n` +
+        'A capture is the .jsonl file pretti writes while recording.'
+      );
+    }
+    // captures predating tagged events had no `type` and were all output
+    return (event.type ? event : { ...event, type: 'out' }) as CaptureEvent;
+  });
 }
 
 function escapeHtml(text: string): string {
@@ -71,11 +104,6 @@ function escapeHtml(text: string): string {
 // The 6x6x6 color cube's channel levels, as xterm defines them.
 const CUBE_LEVELS = [0, 95, 135, 175, 215, 255];
 
-/**
- * An ANSI palette index as a hex color. 0-15 come from the config, so a theme
- * can restyle every color a program asks for by name; 16-255 are the fixed
- * xterm cube and greyscale ramp.
- */
 function paletteColor(index: number, config: PrettiConfig): string {
   if (index < 16) return config.terminal.palette[index]!;
 
@@ -95,12 +123,6 @@ function paletteColor(index: number, config: PrettiConfig): string {
 
 type Cell = NonNullable<ReturnType<NonNullable<ReturnType<Terminal['buffer']['active']['getLine']>>['getCell']>>;
 
-/**
- * The color a cell asks for, or undefined when it wants the terminal default.
- * xterm reports a color as either a 24-bit RGB value or a palette index, and
- * the two mean entirely different numbers - `getFgColor` alone cannot tell
- * them apart, so the mode has to be checked first.
- */
 function cellColor(cell: Cell, ground: 'fg' | 'bg', config: PrettiConfig): string | undefined {
   const isDefault = ground === 'fg' ? cell.isFgDefault() : cell.isBgDefault();
   if (isDefault) return undefined;
@@ -258,15 +280,6 @@ async function renderToGif(
   return gif.finish();
 }
 
-/**
- * Every colour the theme can put on a pixel, for choosing a transparent colour
- * that collides with none of them.
- *
- * The terminal's own colours are the ones that matter: they are what changes
- * between frames, and a collision only shows as a ghost where something
- * changed. The window chrome is here for good measure - it is identical in
- * every frame, so it would be transparent regardless.
- */
 export function themeColors(config: PrettiConfig): string[] {
   const { terminal, window: win } = config;
   return [

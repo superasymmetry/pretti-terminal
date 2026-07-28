@@ -1,9 +1,12 @@
 import * as fs from 'node:fs';
 // see record.ts on why this is the fork and not node-pty itself
 import * as pty from '@lydell/node-pty';
-import { defaultShell, geometry } from './terminal.js';
+import { defaultShell, geometry, requireInteractiveTerminal } from './terminal.js';
 import { loadConfig } from './config.js';
 import { ExitTracker } from './exit-trim.js';
+// Before the shell is spawned: a session nobody can type into is not worth
+// starting, and a stopped one leaves no half-written capture behind.
+requireInteractiveTerminal();
 const shell = defaultShell();
 const outFile = process.argv[2] ?? 'capture.jsonl';
 // The geometry caps are the only thing a bare capture takes from the config -

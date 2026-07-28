@@ -1,4 +1,4 @@
-import type { PrettiConfig } from './config.js';
+import { type PrettiConfig } from './config.js';
 export declare const COLS = 80;
 export declare const ROWS = 24;
 /**
@@ -17,6 +17,20 @@ export declare function geometry(config: PrettiConfig): {
     cols: number;
     rows: number;
 };
+/**
+ * Stops before anything is started when there is no terminal to record from.
+ *
+ * Recording puts stdin in raw mode, so every keystroke reaches the shell being
+ * filmed instead of being buffered into lines - and raw mode only exists on a
+ * TTY. Piped or redirected input has no setRawMode at all, so without this the
+ * session dies on a TypeError from inside node, several steps after the point
+ * where the real answer ("run this in a terminal") was still obvious.
+ *
+ * Called before the browser is opened and before the shell is spawned: this is
+ * not a recoverable condition, and there is no reason to leave either of them
+ * running while we work that out.
+ */
+export declare function requireInteractiveTerminal(): void;
 /**
  * The shell to film. A recording is meant to look like the user's own terminal,
  * so their login shell is what runs - a zsh or fish user recording a bash
