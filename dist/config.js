@@ -1,20 +1,8 @@
-// config.ts - the look of the GIF, in one editable file.
-//
-// Everything the renderer draws that is not the text itself lives here: the
-// terminal palette, the font, the window chrome around it, and the pace of the
-// animation. render.ts and record.ts both read the same resolved config, so a
-// live recording and a later re-render of the same capture come out identical.
-//
-// Nothing is required. A config file may set one key or fifty; whatever it
-// leaves out falls back to DEFAULT_CONFIG.
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 export const DEFAULT_CONFIG = {
     output: {
-        // Downloads rather than the directory you ran in: recording happens inside
-        // whatever project you are demoing, and a GIF is not one of its files.
-        // Written as ~ so a config file stays portable between machines.
         directory: '~/Downloads',
         name: 'output.gif'
     },
@@ -37,9 +25,6 @@ export const DEFAULT_CONFIG = {
     },
     font: {
         family: "'Cascadia Code','JetBrains Mono',Consolas,ui-monospace,monospace",
-        // Every point of this is paid for twice over, in width and in height, by
-        // every frame. 15px is still comfortably readable at full size and costs
-        // about a third less area than the 19px this used to be.
         size: 15,
         lineHeight: 1.55,
         letterSpacing: '.02em',
@@ -82,16 +67,10 @@ export function searchPaths() {
 export class ConfigError extends Error {
 }
 // --- validation ------------------------------------------------------------
-//
-// A config is hand-edited, so a typo is the expected failure, not the strange
-// one. Every check names the key it failed on, and an unknown key is an error
-// rather than a silent no-op - misspelling `backgruond` should not look like
-// the setting simply had no effect.
 function fail(where, message) {
     throw new ConfigError(`${where}: ${message}`);
 }
 const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
-/** Expands #abc to #aabbcc so downstream code only ever sees one shape. */
 function color(where, value) {
     if (typeof value !== 'string' || !HEX.test(value.trim())) {
         fail(where, `expected a hex color like "#1a2b3c", got ${JSON.stringify(value)}`);
@@ -101,17 +80,11 @@ function color(where, value) {
         ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
         : hex;
 }
-/** For CSS values we hand to the browser verbatim - gradients, shadows, fonts. */
 function css(where, value) {
     if (typeof value !== 'string')
         fail(where, `expected a string, got ${JSON.stringify(value)}`);
     return value;
 }
-/**
- * A path fragment. Blank is rejected rather than quietly meaning "the current
- * directory" or "no name" - it is always a typo, and one that would otherwise
- * surface much later as a confusing write error.
- */
 function filePath(where, value) {
     if (typeof value !== 'string')
         fail(where, `expected a string, got ${JSON.stringify(value)}`);
@@ -283,13 +256,6 @@ const ALIASES = {
 function isPlainObject(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
-/**
- * The default sitting at a dotted path, which is what tells us the shape a
- * flag's value has to be coerced to. Walking the defaults rather than a second
- * table of flags means a new setting is spelled out once and gets its flag for
- * free - and a misspelled path is caught here, named, with its neighbours
- * listed.
- */
 function defaultAt(flag, keys) {
     let node = DEFAULT_CONFIG;
     const walked = [];
@@ -307,7 +273,6 @@ function defaultAt(flag, keys) {
     }
     return node;
 }
-/** Reads a flag's text into whatever type the default at that path has. */
 function coerce(flag, text, fallback) {
     if (typeof fallback === 'number') {
         const value = Number(text);
@@ -323,8 +288,6 @@ function coerce(flag, text, fallback) {
         throw new ConfigError(`${flag}: expected true or false, got "${text}"`);
     }
     if (Array.isArray(fallback)) {
-        // a JSON array if it looks like one, otherwise the comfortable form:
-        // --palette '#111,#f00,...'
         if (text.trim().startsWith('[')) {
             try {
                 return JSON.parse(text);
@@ -335,8 +298,6 @@ function coerce(flag, text, fallback) {
         }
         return text.split(',').map((entry) => entry.trim());
     }
-    // Strings go through untouched - font.family and window.background are CSS
-    // and may well contain commas.
     return text;
 }
 function setPath(target, keys, value) {
@@ -357,11 +318,6 @@ function deepMerge(base, patch) {
     }
     return out;
 }
-/**
- * Pulls every `--<setting> <value>` out of argv and returns them as a config
- * patch. Accepts `--a.b=v` too, and for on/off settings a bare `--a.b` or
- * `--no-a.b`.
- */
 export function takeOverrideArgs(argv = process.argv) {
     const patch = {};
     for (let i = 2; i < argv.length;) {
@@ -374,8 +330,6 @@ export function takeOverrideArgs(argv = process.argv) {
         const equals = arg.indexOf('=');
         let name = (equals === -1 ? arg.slice(2) : arg.slice(2, equals));
         let text = equals === -1 ? undefined : arg.slice(equals + 1);
-        // --no-x is only a negation if x is really an on/off setting; a setting
-        // whose own name began with "no-" would be resolved by the first lookup.
         const negated = !ALIASES[name] && name.startsWith('no-');
         if (negated)
             name = name.slice(3);
@@ -424,18 +378,10 @@ function validateOverrides(patch) {
     }
 }
 // --- loading ---------------------------------------------------------------
-//
-// record/capture/render each read process.argv positionally, so `--config` is
-// pulled out of argv before they see it. cli.ts does that up front; the
-// fallback in load() covers running a module directly with `node dist/....js`.
 let explicitPath;
 let overrides;
 let cached;
 let taken = false;
-/**
- * Removes `--config <path>` and every setting flag from argv, remembering
- * both. Safe to call more than once - only the first call finds anything.
- */
 export function takeConfigArg(argv = process.argv) {
     taken = true;
     takeConfigPath(argv);
@@ -499,21 +445,8 @@ function expandHome(target) {
     }
     return target;
 }
-/**
- * Where the GIF goes: a filename given on the command line if there is one,
- * otherwise output.directory + output.name from the config. The argument wins
- * because it is the more specific instruction - the config is the standing
- * preference, the argument is this one run.
- *
- * A named file is taken as written, relative to the directory you ran in; only
- * the config's own pair is joined. Creates the directory, since a config
- * pointing at ~/Videos/demos should not fail because the folder is not there
- * yet.
- */
 export function resolveOutputPath(config, explicit) {
     const { directory, name } = config.output;
-    // a name with no extension at all is a name, not a file: `"name": "demo"`
-    // means demo.gif rather than an extensionless file nothing will open
     const filename = path.extname(name) ? name : `${name}.gif`;
     const target = explicit
         ? path.resolve(expandHome(explicit))
@@ -526,12 +459,6 @@ export function resolveOutputPath(config, explicit) {
     }
     return target;
 }
-/**
- * Writes the config file, applying `patch`. A file that already exists is
- * edited in place and keeps its shape - only the settings named on the command
- * line change - so this is the same operation as opening it in an editor. A new
- * file is written out in full, as something to read and edit later.
- */
 export function writeConfig(file, patch) {
     const exists = fs.existsSync(file);
     if (exists && Object.keys(patch).length === 0) {

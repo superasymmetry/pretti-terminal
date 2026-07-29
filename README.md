@@ -1,4 +1,4 @@
-# pretti
+# pretti-terminal
 
 Generate beautiful GIFs of terminal sessions through one command.
 
@@ -7,10 +7,10 @@ Run `pretti`, use your shell normally, and a terminal would be spawned in the sa
 ## Install
 
 ```
-npm install -g pretti-cli
+npm install -g pretti-terminal
 ```
 
-Needs Node 18 or newer.
+That installs the `pretti` command — the package is `pretti-terminal`, but what you type is `pretti`.
 
 ## Use
 

@@ -1,7 +1,26 @@
 {
-  "name": "pretti-cli",
+  "name": "pretti-terminal",
   "version": "0.1.0",
   "private": false,
+  "description": "Record your terminal session and turn it into a beautiful GIF with one command.",
+  "keywords": [
+    "terminal",
+    "gif",
+    "recorder",
+    "screencast",
+    "cli",
+    "asciinema",
+    "demo"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/superasymmetry/pretti-terminal#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superasymmetry/pretti-terminal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/superasymmetry/pretti-terminal/issues"
+  },
   "type": "module",
   "engines": {
     "node": ">=18"

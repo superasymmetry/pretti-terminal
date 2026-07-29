@@ -65,11 +65,6 @@ function escapeHtml(text) {
 }
 // The 6x6x6 color cube's channel levels, as xterm defines them.
 const CUBE_LEVELS = [0, 95, 135, 175, 215, 255];
-/**
- * An ANSI palette index as a hex color. 0-15 come from the config, so a theme
- * can restyle every color a program asks for by name; 16-255 are the fixed
- * xterm cube and greyscale ramp.
- */
 function paletteColor(index, config) {
     if (index < 16)
         return config.terminal.palette[index];
@@ -85,12 +80,6 @@ function paletteColor(index, config) {
     const grey = 8 + (index - 232) * 10;
     return `#${grey.toString(16).padStart(2, '0').repeat(3)}`;
 }
-/**
- * The color a cell asks for, or undefined when it wants the terminal default.
- * xterm reports a color as either a 24-bit RGB value or a palette index, and
- * the two mean entirely different numbers - `getFgColor` alone cannot tell
- * them apart, so the mode has to be checked first.
- */
 function cellColor(cell, ground, config) {
     const isDefault = ground === 'fg' ? cell.isFgDefault() : cell.isBgDefault();
     if (isDefault)
@@ -228,15 +217,6 @@ async function renderToGif(events, outFile, config) {
     }
     return gif.finish();
 }
-/**
- * Every colour the theme can put on a pixel, for choosing a transparent colour
- * that collides with none of them.
- *
- * The terminal's own colours are the ones that matter: they are what changes
- * between frames, and a collision only shows as a ghost where something
- * changed. The window chrome is here for good measure - it is identical in
- * every frame, so it would be transparent regardless.
- */
 export function themeColors(config) {
     const { terminal, window: win } = config;
     return [

@@ -1,10 +1,4 @@
 #!/usr/bin/env node
-// cli.ts - the single entry point users actually type.
-//
-// record/capture/render are each standalone programs that read process.argv
-// directly. Rather than rewrite them, this dispatches to one of them and
-// removes the subcommand token from argv first, so each module sees exactly
-// the argv shape it saw when it was run as `node dist/record.js ...`.
 import { ConfigError, overrideArgs, patchPaths, takeConfigArg, writeConfig } from './config.js';
 const HELP = `pretti - record your terminal, get a GIF
 
@@ -102,16 +96,10 @@ async function main() {
         process.exitCode = 1;
         return;
     }
-    // Bare `pretti` means record - the common case gets no ceremony. Anything
-    // that is not a known subcommand is treated as record's first argument, so
-    // `pretti demo.gif` works too.
     const command = isCommand(first) ? first : 'record';
     if (isCommand(first))
         process.argv.splice(2, 1);
-    // These modules do their work on import, except render, which exports main.
     if (command === 'config') {
-        // Here the flags are the edit, not a one-off override: they are written to
-        // the file rather than applied to a render.
         const file = process.argv[2] ?? 'pretti.config.json';
         const patch = overrideArgs();
         const result = writeConfig(file, patch);
@@ -120,13 +108,8 @@ async function main() {
             : `Updated ${file}: ${patchPaths(patch).join(', ')}`);
     }
     else if (command === 'install') {
-        // The same script npm's postinstall hook runs. Imported by URL because it
-        // lives outside src/ - it has to run before anything is compiled - so there
-        // is no built copy of it under dist/ to import by path.
         const url = new URL('../scripts/install-browser.js', import.meta.url);
         const { installBrowser, reportMissing } = await import(url.href);
-        // Asked for outright, so unlike the postinstall hook this reports failure:
-        // nothing else is going to pick the problem up afterwards.
         const result = installBrowser();
         if (!result.ok) {
             if (result.reason !== 'bad-channel')

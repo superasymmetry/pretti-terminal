@@ -1,67 +1,66 @@
 {"t":0,"type":"meta","cols":100,"rows":28}
-{"t":97,"type":"out","data":"\u001b[?9001h\u001b[?1004h"}
-{"t":214,"type":"out","data":"\u001b[?25l\u001b[2J\u001b[m\u001b[HWindows PowerShell\r\nCopyright (C) Microsoft Corporation. All rights reserved.\u001b]0;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h"}
-{"t":232,"type":"out","data":"\u001b[?25l\u001b[4;1H\u001b[?25h"}
-{"t":457,"type":"out","data":"PS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-cli> "}
-{"t":1913,"type":"out","data":"\u001b[?25l"}
-{"t":1925,"type":"out","data":"\u001b[93me\u001b[?25h"}
-{"t":2087,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2097,"type":"out","data":"\u001b[93m\bec\u001b[?25h"}
-{"t":2166,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2190,"type":"out","data":"\u001b[93m\u001b[4;64Hech\u001b[?25h"}
-{"t":2221,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2236,"type":"out","data":"\u001b[93m\u001b[4;64Hecho\u001b[?25h"}
-{"t":2330,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2344,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[?25h"}
-{"t":2505,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2517,"type":"out","data":"\u001b[91m\u001b[4;62H> \u001b[93mecho \u001b[36m\"\u001b[?25h"}
-{"t":2687,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2702,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"d\u001b[?25h"}
-{"t":2852,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":2875,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"de\u001b[?25h"}
-{"t":2989,"type":"out","data":"\u001b[?25l\u001b[m\u001b[93m\u001b[4;64Hecho \u001b[36m\"dem"}
-{"t":2998,"type":"out","data":"\u001b[m\u001b[?25h"}
-{"t":3074,"type":"out","data":"\u001b[?25l"}
-{"t":3093,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo\u001b[?25h"}
-{"t":3258,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3282,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo \u001b[?25h"}
-{"t":3444,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3466,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo g\u001b[?25h"}
-{"t":3526,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3545,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo gi\u001b[?25h"}
-{"t":3810,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":3825,"type":"out","data":"\u001b[93m\u001b[4;64Hecho \u001b[36m\"demo gif\u001b[?25h"}
-{"t":4078,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":4090,"type":"out","data":"\u001b[4;62H> \u001b[93mecho \u001b[36m\"demo gif\"\u001b[?25h"}
-{"t":4313,"type":"out","data":"\u001b[m"}
-{"t":4325,"type":"out","data":"\r\n"}
-{"t":4495,"type":"out","data":"demo gif"}
-{"t":4510,"type":"out","data":"\r\nPS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-cli> "}
-{"t":5002,"type":"out","data":"\u001b[?25l"}
-{"t":5022,"type":"out","data":"\u001b[93me\u001b[?25h"}
-{"t":5271,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":5286,"type":"out","data":"\u001b[93m\bei\u001b[?25h"}
-{"t":5621,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":5642,"type":"out","data":"\u001b[93m\u001b[6;64He \b\u001b[?25h"}
-{"t":5736,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":5750,"type":"out","data":"\u001b[93m\bex\u001b[?25h"}
-{"t":5820,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":5829,"type":"out","data":"\u001b[93m\u001b[6;64Hexi\u001b[?25h"}
-{"t":5945,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":5956,"type":"out","data":"\u001b[93m\u001b[6;64Hexis\u001b[?25h"}
-{"t":6058,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":6078,"type":"out","data":"\u001b[93m\u001b[6;64Hexist\u001b[?25h"}
-{"t":6095,"type":"out","data":"\u001b[?25l\u001b[m\u001b[93m\u001b[6;64Hexists\u001b[?25h"}
-{"t":6472,"type":"out","data":"\u001b[m\u001b[?25l"}
-{"t":6484,"type":"out","data":"\u001b[93m\u001b[6;64Hexist \b\u001b[?25h"}
-{"t":6612,"type":"out","data":"\u001b[?25l\u001b[m\u001b[93m\u001b[6;64Hexis"}
-{"t":6626,"type":"out","data":"\u001b[m \b\u001b[?25h"}
-{"t":6772,"type":"out","data":"\u001b[?25l"}
-{"t":6779,"type":"out","data":"\u001b[93m\u001b[6;64Hexi"}
-{"t":6796,"type":"out","data":"\u001b[m "}
-{"t":6826,"type":"out","data":"\b\u001b[?25h"}
-{"t":6875,"type":"out","data":"\u001b[?25l"}
-{"t":6889,"type":"out","data":"\u001b[92m\u001b[6;64Hexit"}
-{"t":6906,"type":"out","data":"\u001b[m\u001b[?25h"}
-{"t":7059,"type":"out","data":"\r\n"}
-{"t":8070,"type":"trim","index":38}
+{"t":66,"type":"out","data":"\u001b[?9001h\u001b[?1004h"}
+{"t":165,"type":"out","data":"\u001b[?25l\u001b[2J\u001b[m\u001b[HWindows PowerShell\r\nCopyright (C) Microsoft Corporation. All rights reserved.\u001b]0;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\u0007\u001b[?25h"}
+{"t":181,"type":"out","data":"\u001b[?25l\u001b[4;1H\u001b[?25h"}
+{"t":382,"type":"out","data":"PS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-terminal> "}
+{"t":1097,"type":"out","data":"\u001b[?25l"}
+{"t":1108,"type":"out","data":"\u001b[93ml\u001b[?25h"}
+{"t":1173,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":1186,"type":"out","data":"\u001b[93m\bls\u001b[?25h"}
+{"t":1273,"type":"out","data":"\u001b[m"}
+{"t":1295,"type":"out","data":"\r\n"}
+{"t":1409,"type":"out","data":"\r\n"}
+{"t":1423,"type":"out","data":"\u001b[?25l\r\n    Directory: C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-terminal\u001b[10;1HMode                 LastWriteTime         Length Name\u001b[45X\r\n----                 -------------         ------ ----\u001b[45X\r\nd-----        2026-07-27   9:17 PM                dist\u001b[45X\r\nd-----        2026-07-27   8:22 PM                node_modules\u001b[37X\r\nd-----        2026-07-27   9:26 PM                scripts\u001b[42X\r\nd-----        2026-07-27   9:50 PM                src\u001b[46X\r\n\u001b[?25h"}
+{"t":1436,"type":"out","data":"\u001b[?25l-a----        2026-07-27   8:22 PM            953 .gitignore\u001b[39X\r\n-a----        2026-07-28   9:47 PM            510 capture.jsonl\u001b[36X\r\n-a----        2026-07-27  10:56 PM         152319 demo.gif\u001b[41X\r\n-a----        2026-07-27  11:37 PM          19779 package-lock.json\u001b[32X\r\n-a----        2026-07-28   9:31 PM           1416 package.json\u001b[37X\r\n-a----        2026-07-27  10:59 PM           1320 pretti.config.json\u001b[31X\r\n-a----        2026-07-27  11:38 PM           5634 README.md\u001b[40X\r\n-a----        2026-07-28   9:32 PM            490 recording.json\u001b[35X\r\n-a----        2026-07-25   1:41 PM           1094 tsconfig.json\u001b[36X\u001b[27;1H\u001b[?25h"}
+{"t":1455,"type":"out","data":"PS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-terminal> "}
+{"t":2793,"type":"out","data":"\u001b[?25l"}
+{"t":2804,"type":"out","data":"\u001b[93me\u001b[?25h"}
+{"t":2958,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":2974,"type":"out","data":"\u001b[93m\bec\u001b[?25h"}
+{"t":3042,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3053,"type":"out","data":"\u001b[93m\u001b[27;69Hech\u001b[?25h"}
+{"t":3096,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3116,"type":"out","data":"\u001b[93m\u001b[27;69Hecho\u001b[?25h"}
+{"t":3197,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3207,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[?25h"}
+{"t":3349,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3364,"type":"out","data":"\u001b[91m\u001b[27;67H> \u001b[93mecho \u001b[36m\"\u001b[?25h"}
+{"t":3719,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3739,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"h\u001b[?25h"}
+{"t":3809,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3833,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"he\u001b[?25h"}
+{"t":3906,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":3926,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hel\u001b[?25h"}
+{"t":4016,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4035,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hell\u001b[?25h"}
+{"t":4149,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4161,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hello\u001b[?25h"}
+{"t":4499,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4510,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hello \u001b[?25h"}
+{"t":4664,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4681,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hello w\u001b[?25h"}
+{"t":4731,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4743,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hello wo\u001b[?25h"}
+{"t":4847,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4871,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hello wor\u001b[?25h"}
+{"t":4938,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":4949,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hello worl\u001b[?25h"}
+{"t":5036,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":5044,"type":"out","data":"\u001b[93m\u001b[27;69Hecho \u001b[36m\"hello world\u001b[?25h"}
+{"t":5279,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":5296,"type":"out","data":"\u001b[27;67H> \u001b[93mecho \u001b[36m\"hello world\"\u001b[?25h"}
+{"t":5487,"type":"out","data":"\u001b[m"}
+{"t":5498,"type":"out","data":"\r\n"}
+{"t":5635,"type":"out","data":"hello world\r"}
+{"t":5657,"type":"out","data":"\nPS C:\\Users\\stringbot\\Documents\\Github\\pretti-demo\\pretti-terminal>\u001b[1C"}
+{"t":6445,"type":"out","data":"\u001b[?25l"}
+{"t":6461,"type":"out","data":"\u001b[93me\u001b[?25h"}
+{"t":6619,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":6634,"type":"out","data":"\u001b[93m\bex\u001b[?25h"}
+{"t":6708,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":6727,"type":"out","data":"\u001b[93m\u001b[28;69Hexi\u001b[?25h"}
+{"t":6791,"type":"out","data":"\u001b[m\u001b[?25l"}
+{"t":6806,"type":"out","data":"\u001b[92m\u001b[28;69Hexit\u001b[?25h"}
+{"t":6901,"type":"out","data":"\u001b[m"}
+{"t":6913,"type":"out","data":"\r\n"}
+{"t":7950,"type":"trim","index":54}

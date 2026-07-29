@@ -20,30 +20,13 @@ let encoder;
 let writeStream;
 let lastPixels;
 let frames = 0;
-// The frame we have been given but not yet written, and how long it is to be
-// held for. A frame cannot go out the moment it arrives: the `repeat` messages
-// that extend it arrive afterwards, and its delay has to be known before it is
-// encoded. So each frame waits here until the next distinct one displaces it.
+// the frame we hold but not written yet
 let held;
 // The previous frame's pixels, as they really were - the mask below is applied
 // to a copy, so what is compared against is always the true image rather than
 // one full of holes.
 let prevPixels;
 let transparencyOn = false;
-/**
- * A colour to spend on "transparent", as far from everything the theme draws as
- * it can be.
- *
- * The encoder does not reserve a palette slot for transparency: it maps the
- * colour we name here to the *nearest entry in the frame's own table*, and every
- * pixel that quantises to that entry then reads as transparent too. Since a
- * transparent pixel shows the previous frame through, a collision with a colour
- * actually on screen is a ghost - text that will not erase. Picking the emptiest
- * corner of the colour space leaves that nearest entry as far from any real
- * pixel as the theme allows.
- */
-// The 6x6x6 colour cube the GIF palette is built around: a grid fine enough to
-// find an empty corner in, and small enough to brute force.
 const CUBE = [0, 95, 135, 175, 215, 255];
 function transparentColor(colors) {
     const points = colors
@@ -77,16 +60,6 @@ function transparentColor(colors) {
     return best;
 }
 const TRANSPARENT = transparentColor(themeColors);
-/**
- * The frame to actually encode: a copy with every pixel unchanged since the
- * previous frame marked transparent, so it compresses to a run rather than
- * being spelled out again.
- *
- * Only the alpha byte is touched. The encoder decides transparency on alpha,
- * but quantises on RGB, and the optimiser measures frame similarity on RGB too -
- * blanking the colour as well would corrupt the palette and defeat the table
- * reuse that keeps encoding fast enough to record with.
- */
 function mask(pixels) {
     if (!diff || !prevPixels || prevPixels.length !== pixels.length)
         return pixels;
@@ -101,17 +74,6 @@ function mask(pixels) {
     return masked;
 }
 function open(width, height) {
-    // GIF dimensions come from the rendered frames, not a fixed constant. They
-    // are read once: every frame is the same terminal card, so they cannot drift
-    // unless the window is resized, which nothing here supports anyway.
-    //
-    // The optimizer is what makes encoding fast enough to keep up with capture.
-    // Quantising a frame costs ~190ms here; with it on, a frame that is >=90%
-    // identical to the one before reuses that frame's colour table instead, which
-    // is nearly every frame of a terminal recording - a keystroke changes a cell
-    // or two out of half a million pixels. Measured 193ms -> 72ms per frame, at
-    // the same file size. Its `totalFrames` argument only drives a progress event
-    // we do not use, so leaving it 0 costs nothing.
     const enc = new GIFEncoder(width, height, algorithm, true);
     writeStream = fs.createWriteStream(outFile);
     enc.createReadStream().pipe(writeStream);
@@ -120,39 +82,17 @@ function open(width, height) {
     enc.setDelay(delayMs);
     enc.setQuality(quality);
     if (diff) {
-        // Mandatory, and not the default: naming a transparent colour otherwise
-        // sets disposal to "restore to background", which clears the canvas between
-        // frames and leaves the transparent pixels showing nothing rather than the
-        // frame before. 1 is "leave it there", which is the whole point.
         enc.setDispose(1);
     }
     return enc;
 }
-/**
- * Turn transparency on, once the first frame is safely behind us.
- *
- * It has to wait: a transparent pixel means "whatever was here before", and on
- * the opening frame there is no before. The encoder maps our colour to the
- * nearest entry in the palette rather than reserving one, so a handful of real
- * pixels share that entry and would be punched out - on frame one that leaves a
- * hole nothing ever fills, since every later frame is transparent there too.
- * Written whole, frame one costs a few KB once and everything after it diffs.
- */
 function enableTransparency(enc) {
     if (transparencyOn)
         return;
     transparencyOn = true;
-    // The encoder only considers palette entries flagged in `usedEntry` when it
-    // looks for the colour nearest ours - and only its neuquant path fills that
-    // in. Flagging them all keeps the search honest whichever quantiser ran.
     enc.usedEntry = new Array(256).fill(true);
     enc.setTransparent(TRANSPARENT);
 }
-/**
- * Write the frame that has been waiting, for however long it ended up being
- * held. One frame with a long delay rather than N identical frames: they look
- * the same, but the GIF pays for each of the N in full.
- */
 function flush() {
     if (!held)
         return;

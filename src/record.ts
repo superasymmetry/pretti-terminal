@@ -198,6 +198,6 @@ ptyProcess.onExit(async ({ exitCode }) => {
   const encodeStart = Date.now();
   await gif.finish();
   const waited = ((Date.now() - encodeStart) / 1000).toFixed(1);
-  console.log(`Done: ${outFile} (${gif.frameCount} frames, ${waited}s waiting on the encoder)`);
+  console.log(`Done: ${outFile}`);
   process.exit(exitCode);
 });
