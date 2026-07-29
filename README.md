@@ -4,6 +4,13 @@ Generate beautiful GIFs of terminal sessions through one command.
 
 Run `pretti`, use your shell normally, and a terminal would be spawned in the same directory in which you ran the command. Do stuff in that terminal. Type `exit` to stop recording. 
 
+https://github.com/user-attachments/assets/043f2674-7ccd-47a0-bdcd-1cd40da105a7
+
+This was the output GIF generated:
+
+<img width="1089" height="869" alt="output" src="https://github.com/user-attachments/assets/60210b96-b990-49ce-8547-34e66c08eb32" />
+
+
 ## Install
 
 ```
