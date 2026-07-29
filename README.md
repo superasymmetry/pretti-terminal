@@ -13,8 +13,11 @@ This was the output GIF generated:
 
 ## Install
 
+Note that you would need Node 20 or higher. 
+
 ```
 npm install -g pretti-terminal
+pretti install
 ```
 
 That installs the `pretti` command — the package is `pretti-terminal`, but what you type is `pretti`.
