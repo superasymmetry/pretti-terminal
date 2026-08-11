@@ -13,7 +13,7 @@ This was the output GIF generated:
 
 ## Install
 
-Note that you would need Node 20 or higher. 
+Note that you would need Node 18 or higher. 
 
 ```
 npm install -g pretti-terminal
